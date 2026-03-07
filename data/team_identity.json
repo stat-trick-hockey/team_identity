@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-03-07T21:00:30.341111Z",
+    "generated": "2026-03-07T22:33:56.896048+00:00",
     "season": "2025-26",
     "situation": "All situations (NHL API)",
     "dimensions": [
@@ -24,7 +24,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.5576,
         "discipline": 0.6745,
         "goaltending": 0.2487,
         "defensive": 0.3618
@@ -33,8 +33,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 21.44,
+        "blocks_per_gp": 14.9,
         "pim_per_gp": 9.42,
         "save_pct": 0.8798,
         "shots_against_per_gp": 29.13,
@@ -45,12 +45,15 @@
         "possession": 1,
         "transition": 1,
         "finishing": 1,
-        "physical": 1,
+        "physical": 10,
         "discipline": 24,
         "goaltending": 25,
         "defensive": 20
       },
-      "gp": 62
+      "gp": 62,
+      "standings_rank": 12,
+      "points": 73,
+      "wins": 35
     },
     "BOS": {
       "name": "Boston Bruins",
@@ -61,7 +64,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.7964,
         "discipline": 0.1863,
         "goaltending": 0.6885,
         "defensive": 0.2579
@@ -70,8 +73,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 23.56,
+        "blocks_per_gp": 15.56,
         "pim_per_gp": 13.0,
         "save_pct": 0.8966,
         "shots_against_per_gp": 29.94,
@@ -87,7 +90,10 @@
         "goaltending": 9,
         "defensive": 26
       },
-      "gp": 62
+      "gp": 62,
+      "standings_rank": 10,
+      "points": 75,
+      "wins": 35
     },
     "BUF": {
       "name": "Buffalo Sabres",
@@ -98,7 +104,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.3443,
         "discipline": 0.7361,
         "goaltending": 0.8141,
         "defensive": 0.235
@@ -107,8 +113,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 19.06,
+        "blocks_per_gp": 15.02,
         "pim_per_gp": 8.97,
         "save_pct": 0.9014,
         "shots_against_per_gp": 30.11,
@@ -119,12 +125,15 @@
         "possession": 3,
         "transition": 3,
         "finishing": 3,
-        "physical": 3,
+        "physical": 19,
         "discipline": 20,
         "goaltending": 4,
         "defensive": 28
       },
-      "gp": 62
+      "gp": 62,
+      "standings_rank": 6,
+      "points": 80,
+      "wins": 37
     },
     "CGY": {
       "name": "Calgary Flames",
@@ -135,7 +144,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.5379,
         "discipline": 0.3607,
         "goaltending": 0.7487,
         "defensive": 0.313
@@ -144,8 +153,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 21.05,
+        "blocks_per_gp": 15.16,
         "pim_per_gp": 11.72,
         "save_pct": 0.8989,
         "shots_against_per_gp": 29.51,
@@ -156,12 +165,15 @@
         "possession": 4,
         "transition": 4,
         "finishing": 4,
-        "physical": 4,
+        "physical": 11,
         "discipline": 28,
         "goaltending": 7,
         "defensive": 24
       },
-      "gp": 61
+      "gp": 61,
+      "standings_rank": 31,
+      "points": 55,
+      "wins": 24
     },
     "CAR": {
       "name": "Carolina Hurricanes",
@@ -172,7 +184,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.1209,
         "discipline": 0.8922,
         "goaltending": 0.3403,
         "defensive": 1.0
@@ -181,8 +193,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 19.37,
+        "blocks_per_gp": 10.95,
         "pim_per_gp": 7.82,
         "save_pct": 0.8833,
         "shots_against_per_gp": 24.18,
@@ -193,12 +205,15 @@
         "possession": 5,
         "transition": 5,
         "finishing": 5,
-        "physical": 5,
+        "physical": 29,
         "discipline": 11,
         "goaltending": 21,
         "defensive": 1
       },
-      "gp": 62
+      "gp": 62,
+      "standings_rank": 3,
+      "points": 86,
+      "wins": 40
     },
     "CHI": {
       "name": "Chicago Blackhawks",
@@ -218,8 +233,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 17.27,
+        "blocks_per_gp": 12.15,
         "pim_per_gp": 9.34,
         "save_pct": 0.8921,
         "shots_against_per_gp": 29.31,
@@ -230,12 +245,15 @@
         "possession": 6,
         "transition": 6,
         "finishing": 6,
-        "physical": 6,
+        "physical": 31,
         "discipline": 22,
         "goaltending": 15,
         "defensive": 22
       },
-      "gp": 62
+      "gp": 62,
+      "standings_rank": 30,
+      "points": 56,
+      "wins": 23
     },
     "COL": {
       "name": "Colorado Avalanche",
@@ -246,7 +264,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.0458,
         "discipline": 0.9909,
         "goaltending": 1.0,
         "defensive": 0.6975
@@ -255,8 +273,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 17.1,
+        "blocks_per_gp": 13.15,
         "pim_per_gp": 7.1,
         "save_pct": 0.9085,
         "shots_against_per_gp": 26.52,
@@ -267,12 +285,15 @@
         "possession": 7,
         "transition": 7,
         "finishing": 7,
-        "physical": 7,
+        "physical": 30,
         "discipline": 2,
         "goaltending": 1,
         "defensive": 7
       },
-      "gp": 61
+      "gp": 61,
+      "standings_rank": 1,
+      "points": 93,
+      "wins": 42
     },
     "CBJ": {
       "name": "Columbus Blue Jackets",
@@ -283,7 +304,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.3789,
         "discipline": 0.9105,
         "goaltending": 0.6492,
         "defensive": 0.2475
@@ -292,8 +313,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 19.59,
+        "blocks_per_gp": 14.79,
         "pim_per_gp": 7.69,
         "save_pct": 0.8951,
         "shots_against_per_gp": 30.02,
@@ -304,12 +325,15 @@
         "possession": 8,
         "transition": 8,
         "finishing": 8,
-        "physical": 8,
+        "physical": 17,
         "discipline": 7,
         "goaltending": 13,
         "defensive": 27
       },
-      "gp": 61
+      "gp": 61,
+      "standings_rank": 13,
+      "points": 72,
+      "wins": 32
     },
     "DAL": {
       "name": "Dallas Stars",
@@ -320,7 +344,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.3093,
         "discipline": 0.8218,
         "goaltending": 0.7487,
         "defensive": 0.7027
@@ -329,8 +353,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 18.61,
+        "blocks_per_gp": 15.13,
         "pim_per_gp": 8.34,
         "save_pct": 0.8989,
         "shots_against_per_gp": 26.48,
@@ -341,12 +365,15 @@
         "possession": 9,
         "transition": 9,
         "finishing": 9,
-        "physical": 9,
+        "physical": 22,
         "discipline": 15,
         "goaltending": 8,
         "defensive": 6
       },
-      "gp": 62
+      "gp": 62,
+      "standings_rank": 2,
+      "points": 86,
+      "wins": 38
     },
     "DET": {
       "name": "Detroit Red Wings",
@@ -357,7 +384,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.2788,
         "discipline": 0.9091,
         "goaltending": 0.5942,
         "defensive": 0.5401
@@ -366,8 +393,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 17.4,
+        "blocks_per_gp": 16.46,
         "pim_per_gp": 7.7,
         "save_pct": 0.893,
         "shots_against_per_gp": 27.75,
@@ -378,12 +405,15 @@
         "possession": 10,
         "transition": 10,
         "finishing": 10,
-        "physical": 10,
+        "physical": 23,
         "discipline": 8,
         "goaltending": 14,
         "defensive": 14
       },
-      "gp": 63
+      "gp": 63,
+      "standings_rank": 7,
+      "points": 77,
+      "wins": 35
     },
     "EDM": {
       "name": "Edmonton Oilers",
@@ -394,7 +424,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.1563,
         "discipline": 0.6841,
         "goaltending": 0.1257,
         "defensive": 0.626
@@ -403,8 +433,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 17.44,
+        "blocks_per_gp": 14.41,
         "pim_per_gp": 9.35,
         "save_pct": 0.8751,
         "shots_against_per_gp": 27.08,
@@ -415,12 +445,15 @@
         "possession": 11,
         "transition": 11,
         "finishing": 11,
-        "physical": 11,
+        "physical": 28,
         "discipline": 23,
         "goaltending": 29,
         "defensive": 9
       },
-      "gp": 63
+      "gp": 63,
+      "standings_rank": 18,
+      "points": 68,
+      "wins": 30
     },
     "FLA": {
       "name": "Florida Panthers",
@@ -431,7 +464,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.707,
         "discipline": 0.3465,
         "goaltending": 0.0916,
         "defensive": 0.7283
@@ -440,8 +473,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 24.94,
+        "blocks_per_gp": 12.06,
         "pim_per_gp": 11.83,
         "save_pct": 0.8738,
         "shots_against_per_gp": 26.29,
@@ -452,12 +485,15 @@
         "possession": 12,
         "transition": 12,
         "finishing": 12,
-        "physical": 12,
+        "physical": 3,
         "discipline": 29,
         "goaltending": 30,
         "defensive": 5
       },
-      "gp": 63
+      "gp": 63,
+      "standings_rank": 22,
+      "points": 65,
+      "wins": 31
     },
     "LAK": {
       "name": "Los Angeles Kings",
@@ -468,7 +504,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.2743,
         "discipline": 0.8009,
         "goaltending": 0.6545,
         "defensive": 0.5644
@@ -477,8 +513,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 18.93,
+        "blocks_per_gp": 14.08,
         "pim_per_gp": 8.49,
         "save_pct": 0.8953,
         "shots_against_per_gp": 27.56,
@@ -489,12 +525,15 @@
         "possession": 13,
         "transition": 13,
         "finishing": 13,
-        "physical": 13,
+        "physical": 24,
         "discipline": 18,
         "goaltending": 12,
         "defensive": 12
       },
-      "gp": 61
+      "gp": 61,
+      "standings_rank": 24,
+      "points": 64,
+      "wins": 25
     },
     "MIN": {
       "name": "Minnesota Wild",
@@ -505,7 +544,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.5217,
         "discipline": 0.9675,
         "goaltending": 0.9319,
         "defensive": 0.225
@@ -514,8 +553,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 20.63,
+        "blocks_per_gp": 15.52,
         "pim_per_gp": 7.27,
         "save_pct": 0.9059,
         "shots_against_per_gp": 30.19,
@@ -526,12 +565,15 @@
         "possession": 14,
         "transition": 14,
         "finishing": 14,
-        "physical": 14,
+        "physical": 13,
         "discipline": 4,
         "goaltending": 2,
         "defensive": 29
       },
-      "gp": 63
+      "gp": 63,
+      "standings_rank": 4,
+      "points": 84,
+      "wins": 37
     },
     "MTL": {
       "name": "Montreal Canadiens",
@@ -542,7 +584,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.6719,
         "discipline": 0.5774,
         "goaltending": 0.2513,
         "defensive": 0.5792
@@ -551,8 +593,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 21.61,
+        "blocks_per_gp": 16.49,
         "pim_per_gp": 10.13,
         "save_pct": 0.8799,
         "shots_against_per_gp": 27.44,
@@ -563,12 +605,15 @@
         "possession": 15,
         "transition": 15,
         "finishing": 15,
-        "physical": 15,
+        "physical": 8,
         "discipline": 27,
         "goaltending": 24,
         "defensive": 11
       },
-      "gp": 61
+      "gp": 61,
+      "standings_rank": 8,
+      "points": 76,
+      "wins": 33
     },
     "NSH": {
       "name": "Nashville Predators",
@@ -579,7 +624,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.2009,
         "discipline": 0.7866,
         "goaltending": 0.3089,
         "defensive": 0.3618
@@ -588,8 +633,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 19.56,
+        "blocks_per_gp": 11.95,
         "pim_per_gp": 8.6,
         "save_pct": 0.8821,
         "shots_against_per_gp": 29.13,
@@ -600,12 +645,15 @@
         "possession": 16,
         "transition": 16,
         "finishing": 16,
-        "physical": 16,
+        "physical": 27,
         "discipline": 19,
         "goaltending": 22,
         "defensive": 21
       },
-      "gp": 62
+      "gp": 62,
+      "standings_rank": 25,
+      "points": 64,
+      "wins": 28
     },
     "NJD": {
       "name": "New Jersey Devils",
@@ -616,7 +664,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.3418,
         "discipline": 0.9823,
         "goaltending": 0.5654,
         "defensive": 0.5385
@@ -625,8 +673,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 19.44,
+        "blocks_per_gp": 14.42,
         "pim_per_gp": 7.16,
         "save_pct": 0.8919,
         "shots_against_per_gp": 27.76,
@@ -637,12 +685,15 @@
         "possession": 17,
         "transition": 17,
         "finishing": 17,
-        "physical": 17,
+        "physical": 20,
         "discipline": 3,
         "goaltending": 16,
         "defensive": 15
       },
-      "gp": 62
+      "gp": 62,
+      "standings_rank": 26,
+      "points": 64,
+      "wins": 31
     },
     "NYI": {
       "name": "New York Islanders",
@@ -653,7 +704,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.3255,
         "discipline": 0.8831,
         "goaltending": 0.7749,
         "defensive": 0.4971
@@ -662,8 +713,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 18.87,
+        "blocks_per_gp": 15.0,
         "pim_per_gp": 7.89,
         "save_pct": 0.8999,
         "shots_against_per_gp": 28.08,
@@ -674,12 +725,15 @@
         "possession": 18,
         "transition": 18,
         "finishing": 18,
-        "physical": 18,
+        "physical": 21,
         "discipline": 12,
         "goaltending": 6,
         "defensive": 17
       },
-      "gp": 63
+      "gp": 63,
+      "standings_rank": 11,
+      "points": 75,
+      "wins": 35
     },
     "NYR": {
       "name": "New York Rangers",
@@ -690,7 +744,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 1.0,
         "discipline": 0.9149,
         "goaltending": 0.5393,
         "defensive": 0.3975
@@ -699,8 +753,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 26.23,
+        "blocks_per_gp": 14.85,
         "pim_per_gp": 7.66,
         "save_pct": 0.8909,
         "shots_against_per_gp": 28.85,
@@ -711,12 +765,15 @@
         "possession": 19,
         "transition": 19,
         "finishing": 19,
-        "physical": 19,
+        "physical": 1,
         "discipline": 6,
         "goaltending": 19,
         "defensive": 19
       },
-      "gp": 61
+      "gp": 61,
+      "standings_rank": 29,
+      "points": 56,
+      "wins": 24
     },
     "OTT": {
       "name": "Ottawa Senators",
@@ -727,7 +784,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.7004,
         "discipline": 0.5998,
         "goaltending": 0.0,
         "defensive": 0.9553
@@ -736,8 +793,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 23.74,
+        "blocks_per_gp": 13.75,
         "pim_per_gp": 9.97,
         "save_pct": 0.8703,
         "shots_against_per_gp": 24.52,
@@ -748,12 +805,15 @@
         "possession": 20,
         "transition": 20,
         "finishing": 20,
-        "physical": 20,
+        "physical": 4,
         "discipline": 26,
         "goaltending": 31,
         "defensive": 2
       },
-      "gp": 61
+      "gp": 61,
+      "standings_rank": 16,
+      "points": 69,
+      "wins": 30
     },
     "PHI": {
       "name": "Philadelphia Flyers",
@@ -764,7 +824,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.6801,
         "discipline": 0.611,
         "goaltending": 0.2644,
         "defensive": 0.7947
@@ -773,8 +833,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 22.62,
+        "blocks_per_gp": 15.1,
         "pim_per_gp": 9.89,
         "save_pct": 0.8804,
         "shots_against_per_gp": 25.77,
@@ -785,12 +845,15 @@
         "possession": 21,
         "transition": 21,
         "finishing": 21,
-        "physical": 21,
+        "physical": 7,
         "discipline": 25,
         "goaltending": 23,
         "defensive": 4
       },
-      "gp": 61
+      "gp": 61,
+      "standings_rank": 20,
+      "points": 67,
+      "wins": 28
     },
     "PIT": {
       "name": "Pittsburgh Penguins",
@@ -801,7 +864,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.2108,
         "discipline": 0.8546,
         "goaltending": 0.6806,
         "defensive": 0.6109
@@ -810,8 +873,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 17.64,
+        "blocks_per_gp": 15.0,
         "pim_per_gp": 8.1,
         "save_pct": 0.8963,
         "shots_against_per_gp": 27.2,
@@ -822,12 +885,15 @@
         "possession": 22,
         "transition": 22,
         "finishing": 22,
-        "physical": 22,
+        "physical": 26,
         "discipline": 13,
         "goaltending": 10,
         "defensive": 10
       },
-      "gp": 61
+      "gp": 61,
+      "standings_rank": 9,
+      "points": 75,
+      "wins": 31
     },
     "SEA": {
       "name": "Seattle Kraken",
@@ -838,7 +904,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.3738,
         "discipline": 0.9082,
         "goaltending": 0.8377,
         "defensive": 0.3299
@@ -847,8 +913,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 18.67,
+        "blocks_per_gp": 16.08,
         "pim_per_gp": 7.7,
         "save_pct": 0.9023,
         "shots_against_per_gp": 29.38,
@@ -859,12 +925,15 @@
         "possession": 23,
         "transition": 23,
         "finishing": 23,
-        "physical": 23,
+        "physical": 18,
         "discipline": 9,
         "goaltending": 3,
         "defensive": 23
       },
-      "gp": 61
+      "gp": 61,
+      "standings_rank": 19,
+      "points": 67,
+      "wins": 29
     },
     "SJS": {
       "name": "San Jose Sharks",
@@ -875,7 +944,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.5366,
         "discipline": 0.8089,
         "goaltending": 0.3822,
         "defensive": 0.2152
@@ -884,8 +953,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 21.07,
+        "blocks_per_gp": 15.12,
         "pim_per_gp": 8.43,
         "save_pct": 0.8849,
         "shots_against_per_gp": 30.27,
@@ -896,12 +965,15 @@
         "possession": 24,
         "transition": 24,
         "finishing": 24,
-        "physical": 24,
+        "physical": 12,
         "discipline": 17,
         "goaltending": 20,
         "defensive": 30
       },
-      "gp": 60
+      "gp": 60,
+      "standings_rank": 21,
+      "points": 65,
+      "wins": 30
     },
     "STL": {
       "name": "St. Louis Blues",
@@ -912,7 +984,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.686,
         "discipline": 0.8988,
         "goaltending": 0.2094,
         "defensive": 0.5448
@@ -921,8 +993,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 23.32,
+        "blocks_per_gp": 14.15,
         "pim_per_gp": 7.77,
         "save_pct": 0.8783,
         "shots_against_per_gp": 27.71,
@@ -933,12 +1005,15 @@
         "possession": 25,
         "transition": 25,
         "finishing": 25,
-        "physical": 25,
+        "physical": 6,
         "discipline": 10,
         "goaltending": 26,
         "defensive": 13
       },
-      "gp": 62
+      "gp": 62,
+      "standings_rank": 28,
+      "points": 57,
+      "wins": 24
     },
     "TBL": {
       "name": "Tampa Bay Lightning",
@@ -949,7 +1024,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.2479,
         "discipline": 0.0,
         "goaltending": 0.7827,
         "defensive": 0.6706
@@ -958,8 +1033,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 19.55,
+        "blocks_per_gp": 12.73,
         "pim_per_gp": 14.37,
         "save_pct": 0.9002,
         "shots_against_per_gp": 26.73,
@@ -970,12 +1045,15 @@
         "possession": 26,
         "transition": 26,
         "finishing": 26,
-        "physical": 26,
+        "physical": 25,
         "discipline": 31,
         "goaltending": 5,
         "defensive": 8
       },
-      "gp": 60
+      "gp": 60,
+      "standings_rank": 5,
+      "points": 80,
+      "wins": 38
     },
     "TOR": {
       "name": "Toronto Maple Leafs",
@@ -986,7 +1064,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.6913,
         "discipline": 0.9394,
         "goaltending": 0.5602,
         "defensive": 0.0
@@ -995,8 +1073,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 22.59,
+        "blocks_per_gp": 15.33,
         "pim_per_gp": 7.48,
         "save_pct": 0.8917,
         "shots_against_per_gp": 31.94,
@@ -1007,12 +1085,15 @@
         "possession": 27,
         "transition": 27,
         "finishing": 27,
-        "physical": 27,
+        "physical": 5,
         "discipline": 5,
         "goaltending": 18,
         "defensive": 31
       },
-      "gp": 63
+      "gp": 63,
+      "standings_rank": 23,
+      "points": 65,
+      "wins": 27
     },
     "VAN": {
       "name": "Vancouver Canucks",
@@ -1023,7 +1104,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.4662,
         "discipline": 0.835,
         "goaltending": 0.1309,
         "defensive": 0.2662
@@ -1032,8 +1113,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 21.13,
+        "blocks_per_gp": 13.89,
         "pim_per_gp": 8.24,
         "save_pct": 0.8753,
         "shots_against_per_gp": 29.87,
@@ -1044,12 +1125,15 @@
         "possession": 28,
         "transition": 28,
         "finishing": 28,
-        "physical": 28,
+        "physical": 16,
         "discipline": 14,
         "goaltending": 28,
         "defensive": 25
       },
-      "gp": 62
+      "gp": 62,
+      "standings_rank": 32,
+      "points": 45,
+      "wins": 19
     },
     "VGK": {
       "name": "Vegas Golden Knights",
@@ -1060,7 +1144,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.5084,
         "discipline": 1.0,
         "goaltending": 0.1387,
         "defensive": 0.9083
@@ -1069,8 +1153,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 20.84,
+        "blocks_per_gp": 15.0,
         "pim_per_gp": 7.03,
         "save_pct": 0.8756,
         "shots_against_per_gp": 24.89,
@@ -1081,12 +1165,15 @@
         "possession": 29,
         "transition": 29,
         "finishing": 29,
-        "physical": 29,
+        "physical": 14,
         "discipline": 1,
         "goaltending": 27,
         "defensive": 3
       },
-      "gp": 63
+      "gp": 63,
+      "standings_rank": 14,
+      "points": 72,
+      "wins": 29
     },
     "WSH": {
       "name": "Washington Capitals",
@@ -1097,7 +1184,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.4772,
         "discipline": 0.6976,
         "goaltending": 0.6728,
         "defensive": 0.4953
@@ -1106,8 +1193,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 19.86,
+        "blocks_per_gp": 15.97,
         "pim_per_gp": 9.25,
         "save_pct": 0.896,
         "shots_against_per_gp": 28.09,
@@ -1118,12 +1205,15 @@
         "possession": 30,
         "transition": 30,
         "finishing": 30,
-        "physical": 30,
+        "physical": 15,
         "discipline": 21,
         "goaltending": 11,
         "defensive": 18
       },
-      "gp": 64
+      "gp": 64,
+      "standings_rank": 17,
+      "points": 69,
+      "wins": 31
     },
     "WPG": {
       "name": "Winnipeg Jets",
@@ -1134,7 +1224,7 @@
         "possession": 0.0,
         "transition": 0.0,
         "finishing": 0.0,
-        "physical": 0.0,
+        "physical": 0.5942,
         "discipline": 0.8099,
         "goaltending": 0.5654,
         "defensive": 0.4989
@@ -1143,8 +1233,8 @@
         "possession_shot_share": 0.5,
         "rush_sf60": 0,
         "shooting_pct": 0,
-        "hits_per_gp": 0,
-        "blocks_per_gp": 0,
+        "hits_per_gp": 22.38,
+        "blocks_per_gp": 14.08,
         "pim_per_gp": 8.43,
         "save_pct": 0.8919,
         "shots_against_per_gp": 28.07,
@@ -1155,12 +1245,15 @@
         "possession": 31,
         "transition": 31,
         "finishing": 31,
-        "physical": 31,
+        "physical": 9,
         "discipline": 16,
         "goaltending": 17,
         "defensive": 16
       },
-      "gp": 61
+      "gp": 61,
+      "standings_rank": 27,
+      "points": 60,
+      "wins": 25
     }
   }
 }
