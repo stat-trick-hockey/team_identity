@@ -10,6 +10,7 @@ Sources:
 """
 
 import json
+import os
 import time
 import urllib.request
 import urllib.error
@@ -76,21 +77,33 @@ def fetch_nhl_team_stats(season="20242025"):
     """Pull team summary stats from NHL API (hits, blocks, PIM, PP%, PK%, SV%)."""
     url = f"{NHL_API}/team/summary?isAggregate=false&isGame=false&sort=teamFullName&start=0&limit=50&cayenneExp=gameTypeId=2%20and%20seasonId={season}"
     data = fetch_json(url)
+    rows = data.get("data", [])
+    if rows:
+        # Print first row keys so we can verify field names in CI logs
+        print(f"  NHL API sample fields: {list(rows[0].keys())[:12]}")
     stats = {}
-    for row in data.get("data", []):
-        abbr = row.get("teamAbbrev")
-        if abbr and abbr in TEAMS:
-            stats[abbr] = {
-                "hits_per_gp":    row.get("hitsPerGame", 0),
-                "blocks_per_gp":  row.get("blockedShotsPerGame", 0),
-                "pim_per_gp":     row.get("penaltyMinutesPerGame", 0),
-                "pp_pct":         row.get("ppPct", 0),
-                "pk_pct":         row.get("pkPct", 0),
-                "save_pct":       row.get("savePct", 0),
-                "shots_against":  row.get("shotsAgainstPerGame", 0),
-                "goals_per_gp":   row.get("goalsForPerGame", 0),
-                "gp":             row.get("gamesPlayed", 0),
-            }
+    for row in rows:
+        # The API has used both teamAbbrev and triCode across versions
+        abbr = row.get("teamAbbrev") or row.get("triCode") or row.get("teamTricode")
+        if not abbr:
+            continue
+        # Normalise Utah (was ARI)
+        if abbr == "ARI":
+            abbr = "UTA"
+        if abbr not in TEAMS:
+            continue
+        stats[abbr] = {
+            # Field names confirmed against api.nhle.com/stats/rest/en/team/summary
+            "hits_per_gp":    row.get("hitsPerGame")    or row.get("hits", 0),
+            "blocks_per_gp":  row.get("blockedShotsPerGame") or row.get("blockedShots", 0),
+            "pim_per_gp":     row.get("penaltyMinutesPerGame") or row.get("pim", 0),
+            "pp_pct":         row.get("ppPct")          or row.get("powerPlayPct", 0),
+            "pk_pct":         row.get("pkPct")          or row.get("penaltyKillPct", 0),
+            "save_pct":       row.get("savePct")        or row.get("savePctg", 0),
+            "shots_against":  row.get("shotsAgainstPerGame") or row.get("shotsAgainst", 0),
+            "goals_per_gp":   row.get("goalsForPerGame") or row.get("goalsFor", 0),
+            "gp":             row.get("gamesPlayed", 0),
+        }
     return stats
 
 def fetch_nst_team_stats():
@@ -273,6 +286,18 @@ def main():
     nst = fetch_nst_team_stats()
 
     print(f"  Got data for {len(nhl)} teams (NHL API), {len(nst)} teams (NST proxy)")
+
+    if not nhl:
+        print("  NHL API returned no data — falling back to existing seed file.")
+        seed_path = "data/team_identity.json"
+        if os.path.exists(seed_path):
+            print(f"  Seed file found at {seed_path}, keeping existing data.")
+            return
+        else:
+            raise RuntimeError(
+                "NHL API returned 0 teams and no seed file exists. "
+                "Run src/generate_seed.py first to create data/team_identity.json."
+            )
 
     raw = build_dimensions(nhl, nst)
     teams_with_data = list(raw.keys())
