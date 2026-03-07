@@ -14,7 +14,7 @@ import os
 import time
 import urllib.request
 import urllib.error
-from datetime import datetime
+from datetime import datetime, timezone
 
 # ── Team metadata ────────────────────────────────────────────────────────────
 TEAMS = {
@@ -121,15 +121,47 @@ def _abbr_from_row(row):
             return abbr
     return None
 
+def fetch_standings(season="20252026"):
+    """
+    Fetch current standings rank (by points) for each team.
+    Uses the NHL web API standings endpoint.
+    Returns {abbr: {"standings_rank": int, "points": int, "wins": int}}
+    """
+    url = f"{NHL_WEB}/standings/{season[:4]}-{season[4:6]}-01"
+    # Try current date standings endpoint
+    from datetime import date
+    today = date.today().isoformat()
+    url = f"{NHL_WEB}/standings/{today}"
+    try:
+        data = fetch_json(url)
+        standings = data.get("standings", [])
+        result = {}
+        for i, row in enumerate(standings):
+            abbr = row.get("teamAbbrev", {})
+            if isinstance(abbr, dict):
+                abbr = abbr.get("default", "")
+            if abbr == "ARI":
+                abbr = "UTA"
+            if abbr not in TEAMS:
+                continue
+            result[abbr] = {
+                "standings_rank": i + 1,
+                "points":         row.get("points", 0),
+                "wins":           row.get("wins", 0),
+                "gp":             row.get("gamesPlayed", 0),
+            }
+        print(f"  Standings: {len(result)} teams fetched")
+        return result
+    except Exception as e:
+        print(f"  Warning: standings fetch failed ({e})")
+        return {}
+
+
 def fetch_nhl_team_stats(season="20252026"):
     """
-    Pull team stats from multiple NHL API endpoints and merge by team.
-    Endpoints used:
-      summary   — GP, goals, PP%, PK%
-      hits      — hits per game
-      blockshots — blocked shots per game
-      penalties  — PIM per game
-      goalie    — team save %
+    Pull team stats from NHL API endpoints.
+    Summary is confirmed working. Secondary endpoints probed with field logging.
+    Save% derived from GA/SA in summary as fallback.
     """
     stats = {}
 
@@ -159,57 +191,80 @@ def fetch_nhl_team_stats(season="20252026"):
     if stats:
         sample = list(stats.values())[0]
         print(f"  Summary: {len(stats)} teams, sample GP={sample['gp']}")
+        # Always dump fields + one raw row so we can see what's available
+        raw_rows = _fetch_endpoint("summary", season)
+        if raw_rows:
+            print(f"  SUMMARY FIELDS: {list(raw_rows[0].keys())}")
+            print(f"  SAMPLE ROW: {raw_rows[0]}")
     else:
         print("  Summary endpoint returned 0 teams — printing raw sample")
-        rows = _fetch_endpoint("summary", season)
-        if rows:
-            print(f"  Raw row keys: {list(rows[0].keys())}")
-            print(f"  Raw row sample: {rows[0]}")
+        raw_rows = _fetch_endpoint("summary", season)
+        if raw_rows:
+            print(f"  SUMMARY FIELDS: {list(raw_rows[0].keys())}")
+            print(f"  SAMPLE ROW: {raw_rows[0]}")
         return stats
 
-    # ── Hits ─────────────────────────────────────────────────────────────────
-    for row in _fetch_endpoint("hits", season):
-        abbr = _abbr_from_row(row)
-        if abbr and abbr in stats:
-            gp = stats[abbr]["gp"] or row.get("gamesPlayed", 1)
-            hits = row.get("hits", 0) or row.get("hitsPerGame", 0)
-            # If value looks like a total (>100), convert to per-game
-            stats[abbr]["hits_per_gp"] = hits / gp if hits > 10 else hits
+    def _probe(candidates, stat_key, row_keys, per_game=True):
+        """Try each endpoint name in order; on first success log fields and fill stats."""
+        for ep in candidates:
+            rows = _fetch_endpoint(ep, season)
+            if not rows:
+                continue
+            print(f"  PROBE /{ep} FIELDS: {list(rows[0].keys())}")
+            print(f"  PROBE /{ep} SAMPLE: {rows[0]}")
+            filled = 0
+            for row in rows:
+                abbr = _abbr_from_row(row)
+                if not abbr or abbr not in stats:
+                    continue
+                gp = stats[abbr]["gp"] or row.get("gamesPlayed", 1)
+                val = 0
+                for k in row_keys:
+                    val = row.get(k, 0)
+                    if val:
+                        break
+                if val:
+                    stats[abbr][stat_key] = val / gp if (per_game and val > 10) else val
+                    filled += 1
+            print(f"  {stat_key}: {filled} teams filled from /{ep}")
+            if filled > 20:
+                return  # good enough
+        # All endpoints failed — derive save% from summary if needed
+        if stat_key == "save_pct":
+            for abbr, s in stats.items():
+                if s["save_pct"] == 0 and s.get("shots_against", 0) > 0:
+                    ga_total = s["goals_against_per_gp"] * s["gp"]
+                    sa_total = s["shots_against"] * s["gp"]
+                    if sa_total > 0:
+                        s["save_pct"] = round((sa_total - ga_total) / sa_total, 4)
+            sv_filled = sum(1 for s in stats.values() if s["save_pct"] > 0)
+            print(f"  save_pct: derived from summary GA/SA for {sv_filled} teams")
+        else:
+            print(f"  WARNING: {stat_key} could not be filled from any endpoint")
 
-    # ── Blocked shots ─────────────────────────────────────────────────────────
-    for row in _fetch_endpoint("blockshots", season):
-        abbr = _abbr_from_row(row)
-        if abbr and abbr in stats:
-            gp = stats[abbr]["gp"] or row.get("gamesPlayed", 1)
-            blocks = row.get("blockedShots", 0) or row.get("blockedShotsPerGame", 0)
-            stats[abbr]["blocks_per_gp"] = blocks / gp if blocks > 10 else blocks
+    # ── Probe each secondary stat ─────────────────────────────────────────────
+    _probe(
+        ["hits", "realtime", "teamstats"],
+        "hits_per_gp",
+        ["hits", "hitsPerGame", "hitsFor"],
+    )
+    _probe(
+        ["blockshots", "blockedshots", "realtime"],
+        "blocks_per_gp",
+        ["blockedShots", "blockedShotsPerGame", "blockedShotsFor"],
+    )
+    _probe(
+        ["penalties", "penaltykill"],
+        "pim_per_gp",
+        ["penaltyMinutes", "pim", "penaltyMinutesPerGame", "penaltiesFor"],
+    )
+    _probe(
+        ["goaliestats", "goaliesummary", "goalie"],
+        "save_pct",
+        ["savePct", "savePctg", "savePercentage", "savePctAllSituations"],
+    )
 
-    # ── Penalties ─────────────────────────────────────────────────────────────
-    for row in _fetch_endpoint("penalties", season):
-        abbr = _abbr_from_row(row)
-        if abbr and abbr in stats:
-            gp = stats[abbr]["gp"] or row.get("gamesPlayed", 1)
-            pim = row.get("penaltyMinutes", 0) or row.get("pim", 0) or row.get("penaltyMinutesPerGame", 0)
-            stats[abbr]["pim_per_gp"] = pim / gp if pim > 10 else pim
-
-    # ── Save % (goalie summary — team totals) ─────────────────────────────────
-    for row in _fetch_endpoint("goaliestats", season):
-        abbr = _abbr_from_row(row)
-        if abbr and abbr in stats:
-            sv = row.get("savePct") or row.get("savePctg") or row.get("savePercentage") or 0
-            if sv and stats[abbr]["save_pct"] == 0:
-                stats[abbr]["save_pct"] = sv
-
-    # Fallback save% from shots if goaliestats didn't populate
-    for abbr, s in stats.items():
-        if s["save_pct"] == 0 and s.get("shots_against", 0) > 0:
-            # Approximate: (SA - GA) / SA
-            ga_total = s["goals_against_per_gp"] * s["gp"]
-            sa_total = s["shots_against"] * s["gp"]
-            if sa_total > 0:
-                s["save_pct"] = round((sa_total - ga_total) / sa_total, 4)
-
-    print(f"  Final: {len(stats)} teams merged across endpoints")
+    print(f"  Final: {len(stats)} teams merged")
     return stats
 
 def fetch_nst_team_stats():
@@ -388,6 +443,10 @@ def main():
     nhl = fetch_nhl_team_stats()
     time.sleep(0.5)
 
+    print("Fetching standings...")
+    standings = fetch_standings()
+    time.sleep(0.5)
+
     print("Fetching possession/finishing stats...")
     nst = fetch_nst_team_stats()
 
@@ -442,7 +501,7 @@ def main():
     # Assemble final output
     output = {
         "meta": {
-            "generated": datetime.utcnow().isoformat() + "Z",
+            "generated": datetime.now(timezone.utc).isoformat(),
             "season": "2025-26",
             "situation": "All situations (NHL API)",
             "dimensions": ["possession", "transition", "finishing", "physical",
@@ -483,6 +542,9 @@ def main():
             },
             "ranks": ranks[abbr],
             "gp": nhl.get(abbr, {}).get("gp", 0),
+            "standings_rank": standings.get(abbr, {}).get("standings_rank", None),
+            "points":         standings.get(abbr, {}).get("points", None),
+            "wins":           standings.get(abbr, {}).get("wins", None),
         }
 
     out_path = "data/team_identity.json"
