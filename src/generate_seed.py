@@ -1,4 +1,4 @@
-"""Generate realistic 2024-25 NHL team identity seed data."""
+"""Generate realistic 2025-26 NHL team identity seed data."""
 import json, random
 from datetime import datetime
 
@@ -126,7 +126,7 @@ def raw_stats(abbr):
 output = {
     "meta": {
         "generated": datetime.utcnow().isoformat() + "Z",
-        "season": "2024-25",
+        "season": "2025-26",
         "situation": "All situations",
         "dimensions": DIMS,
         "note": "Scores normalized 0–1 relative to league min/max. Seed data — run fetch_data.py for live stats.",

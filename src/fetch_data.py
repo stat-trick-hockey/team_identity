@@ -91,7 +91,7 @@ NHL_NAME_TO_ABBR = {
     "Arizona Coyotes": "UTA",
 }
 
-def _fetch_endpoint(endpoint, season="20242025"):
+def _fetch_endpoint(endpoint, season="20252026"):
     """Fetch a /team/<endpoint> stats page, return list of rows."""
     url = (f"{NHL_API}/team/{endpoint}?isAggregate=false&isGame=false"
            f"&sort=teamFullName&start=0&limit=50"
@@ -121,7 +121,7 @@ def _abbr_from_row(row):
             return abbr
     return None
 
-def fetch_nhl_team_stats(season="20242025"):
+def fetch_nhl_team_stats(season="20252026"):
     """
     Pull team stats from multiple NHL API endpoints and merge by team.
     Endpoints used:
@@ -220,7 +220,7 @@ def fetch_nst_team_stats():
     - Finishing: shooting % from NHL API
     
     NST teamtable URL (all situations, current season, regular season):
-    https://www.naturalstattrick.com/teamtable.php?fromseason=20242025&thruseason=20242025&stype=2&sit=all&score=all&rate=y&team=all&loc=B&gpf=410&fd=&td=
+    https://www.naturalstattrick.com/teamtable.php?fromseason=20252026&thruseason=20252026&stype=2&sit=all&score=all&rate=y&team=all&loc=B&gpf=410&fd=&td=
     
     The table is HTML — we parse the Rush SF/60 column (column index varies by
     sort; we locate it by header text).
@@ -231,7 +231,7 @@ def fetch_nst_team_stats():
     # ── NHL API for possession + finishing ───────────────────────────────────
     sat_url = (f"{NHL_API}/team/summary?isAggregate=false&isGame=false"
                f"&sort=teamFullName&start=0&limit=50"
-               f"&cayenneExp=gameTypeId=2%20and%20seasonId=20242025")
+               f"&cayenneExp=gameTypeId=2%20and%20seasonId=20252026")
     data = fetch_json(sat_url)
 
     stats = {}
@@ -257,7 +257,7 @@ def fetch_nst_team_stats():
     # diverge (NST uses full names in some columns; we match on team name).
     NST_URL = (
         "https://www.naturalstattrick.com/teamtable.php"
-        "?fromseason=20242025&thruseason=20242025&stype=2&sit=all"
+        "?fromseason=20252026&thruseason=20252026&stype=2&sit=all"
         "&score=all&rate=y&team=all&loc=B&gpf=410&fd=&td="
     )
     try:
@@ -443,7 +443,7 @@ def main():
     output = {
         "meta": {
             "generated": datetime.utcnow().isoformat() + "Z",
-            "season": "2024-25",
+            "season": "2025-26",
             "situation": "All situations (NHL API)",
             "dimensions": ["possession", "transition", "finishing", "physical",
                            "discipline", "goaltending", "defensive"],
