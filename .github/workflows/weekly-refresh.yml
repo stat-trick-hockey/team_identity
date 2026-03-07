@@ -1,0 +1,63 @@
+name: Weekly Team Identity Refresh
+
+on:
+  schedule:
+    # Every Monday at 6:00 AM UTC
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      team:
+        description: 'Generate card for specific team (e.g. FLA). Leave blank for all.'
+        required: false
+      compare:
+        description: 'Second team for comparison card (e.g. EDM)'
+        required: false
+
+jobs:
+  refresh-and-render:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Python deps
+        run: pip install requests
+
+      - name: Install Node deps
+        run: npm ci
+
+      - name: Fetch live team stats
+        run: python src/fetch_data.py
+        # Falls back gracefully if NHL API is unreachable
+
+      - name: Generate cards
+        run: |
+          if [ -n "${{ github.event.inputs.team }}" ]; then
+            ARGS="--team ${{ github.event.inputs.team }}"
+            if [ -n "${{ github.event.inputs.compare }}" ]; then
+              ARGS="$ARGS --compare ${{ github.event.inputs.compare }}"
+            fi
+            node src/card_generator.js $ARGS
+          else
+            node src/card_generator.js --all
+          fi
+
+      - name: Commit updated data + cards
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: weekly team identity refresh [skip ci]"
+          file_pattern: "data/team_identity.json cards/*.png"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "github-actions[bot]@users.noreply.github.com"
