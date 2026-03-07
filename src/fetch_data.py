@@ -73,37 +73,143 @@ def rank(values: dict, higher_is_better=True) -> dict:
 NHL_API = "https://api.nhle.com/stats/rest/en"
 NHL_WEB = "https://api-web.nhle.com/v1"
 
+# Map full team names (as returned by NHL API) to our abbrevs
+NHL_NAME_TO_ABBR = {
+    "Anaheim Ducks": "ANA", "Utah Hockey Club": "UTA", "Boston Bruins": "BOS",
+    "Buffalo Sabres": "BUF", "Calgary Flames": "CGY", "Carolina Hurricanes": "CAR",
+    "Chicago Blackhawks": "CHI", "Colorado Avalanche": "COL",
+    "Columbus Blue Jackets": "CBJ", "Dallas Stars": "DAL", "Detroit Red Wings": "DET",
+    "Edmonton Oilers": "EDM", "Florida Panthers": "FLA", "Los Angeles Kings": "LAK",
+    "Minnesota Wild": "MIN", "Montréal Canadiens": "MTL", "Montreal Canadiens": "MTL",
+    "Nashville Predators": "NSH", "New Jersey Devils": "NJD",
+    "New York Islanders": "NYI", "New York Rangers": "NYR", "Ottawa Senators": "OTT",
+    "Philadelphia Flyers": "PHI", "Pittsburgh Penguins": "PIT", "Seattle Kraken": "SEA",
+    "San Jose Sharks": "SJS", "St. Louis Blues": "STL", "Tampa Bay Lightning": "TBL",
+    "Toronto Maple Leafs": "TOR", "Vancouver Canucks": "VAN",
+    "Vegas Golden Knights": "VGK", "Washington Capitals": "WSH", "Winnipeg Jets": "WPG",
+    # Legacy / alternate spellings
+    "Arizona Coyotes": "UTA",
+}
+
+def _fetch_endpoint(endpoint, season="20242025"):
+    """Fetch a /team/<endpoint> stats page, return list of rows."""
+    url = (f"{NHL_API}/team/{endpoint}?isAggregate=false&isGame=false"
+           f"&sort=teamFullName&start=0&limit=50"
+           f"&cayenneExp=gameTypeId=2%20and%20seasonId={season}")
+    try:
+        data = fetch_json(url)
+        return data.get("data", [])
+    except Exception as e:
+        print(f"  Warning: failed to fetch /team/{endpoint}: {e}")
+        return []
+
+def _abbr_from_row(row):
+    """Extract our team abbrev from an API row using name or triCode fields."""
+    # Try direct abbrev fields first
+    for key in ("teamAbbrev", "triCode", "teamTricode"):
+        val = row.get(key)
+        if val:
+            if val == "ARI":
+                val = "UTA"
+            if val in TEAMS:
+                return val
+    # Fall back to full name lookup
+    for key in ("teamFullName", "teamName", "fullName"):
+        name = row.get(key, "")
+        abbr = NHL_NAME_TO_ABBR.get(name)
+        if abbr:
+            return abbr
+    return None
+
 def fetch_nhl_team_stats(season="20242025"):
-    """Pull team summary stats from NHL API (hits, blocks, PIM, PP%, PK%, SV%)."""
-    url = f"{NHL_API}/team/summary?isAggregate=false&isGame=false&sort=teamFullName&start=0&limit=50&cayenneExp=gameTypeId=2%20and%20seasonId={season}"
-    data = fetch_json(url)
-    rows = data.get("data", [])
-    if rows:
-        # Print first row keys so we can verify field names in CI logs
-        print(f"  NHL API sample fields: {list(rows[0].keys())[:12]}")
+    """
+    Pull team stats from multiple NHL API endpoints and merge by team.
+    Endpoints used:
+      summary   — GP, goals, PP%, PK%
+      hits      — hits per game
+      blockshots — blocked shots per game
+      penalties  — PIM per game
+      goalie    — team save %
+    """
     stats = {}
-    for row in rows:
-        # The API has used both teamAbbrev and triCode across versions
-        abbr = row.get("teamAbbrev") or row.get("triCode") or row.get("teamTricode")
+
+    # ── Summary (GP, goals, PP, PK) ──────────────────────────────────────────
+    for row in _fetch_endpoint("summary", season):
+        abbr = _abbr_from_row(row)
         if not abbr:
             continue
-        # Normalise Utah (was ARI)
-        if abbr == "ARI":
-            abbr = "UTA"
-        if abbr not in TEAMS:
-            continue
         stats[abbr] = {
-            # Field names confirmed against api.nhle.com/stats/rest/en/team/summary
-            "hits_per_gp":    row.get("hitsPerGame")    or row.get("hits", 0),
-            "blocks_per_gp":  row.get("blockedShotsPerGame") or row.get("blockedShots", 0),
-            "pim_per_gp":     row.get("penaltyMinutesPerGame") or row.get("pim", 0),
-            "pp_pct":         row.get("ppPct")          or row.get("powerPlayPct", 0),
-            "pk_pct":         row.get("pkPct")          or row.get("penaltyKillPct", 0),
-            "save_pct":       row.get("savePct")        or row.get("savePctg", 0),
-            "shots_against":  row.get("shotsAgainstPerGame") or row.get("shotsAgainst", 0),
-            "goals_per_gp":   row.get("goalsForPerGame") or row.get("goalsFor", 0),
-            "gp":             row.get("gamesPlayed", 0),
+            "gp":           row.get("gamesPlayed", 0),
+            "goals_per_gp": row.get("goalsForPerGame", 0),
+            "goals_against_per_gp": row.get("goalsAgainstPerGame", 0),
+            "shots_per_gp": row.get("shotsForPerGame", 0),
+            "shots_against": row.get("shotsAgainstPerGame", 0),
+            "pp_pct":       row.get("penaltyKillPct", 0),   # note: field swap below
+            "pk_pct":       row.get("penaltyKillPct", 0),
+            # will be filled by other endpoints
+            "hits_per_gp":   0,
+            "blocks_per_gp": 0,
+            "pim_per_gp":    0,
+            "save_pct":      0,
         }
+        # PP% and PK% live in separate fields
+        stats[abbr]["pp_pct"] = row.get("powerPlayPct") or row.get("ppPct") or 0
+        stats[abbr]["pk_pct"] = row.get("penaltyKillPct") or row.get("pkPct") or 0
+
+    if stats:
+        sample = list(stats.values())[0]
+        print(f"  Summary: {len(stats)} teams, sample GP={sample['gp']}")
+    else:
+        print("  Summary endpoint returned 0 teams — printing raw sample")
+        rows = _fetch_endpoint("summary", season)
+        if rows:
+            print(f"  Raw row keys: {list(rows[0].keys())}")
+            print(f"  Raw row sample: {rows[0]}")
+        return stats
+
+    # ── Hits ─────────────────────────────────────────────────────────────────
+    for row in _fetch_endpoint("hits", season):
+        abbr = _abbr_from_row(row)
+        if abbr and abbr in stats:
+            gp = stats[abbr]["gp"] or row.get("gamesPlayed", 1)
+            hits = row.get("hits", 0) or row.get("hitsPerGame", 0)
+            # If value looks like a total (>100), convert to per-game
+            stats[abbr]["hits_per_gp"] = hits / gp if hits > 10 else hits
+
+    # ── Blocked shots ─────────────────────────────────────────────────────────
+    for row in _fetch_endpoint("blockshots", season):
+        abbr = _abbr_from_row(row)
+        if abbr and abbr in stats:
+            gp = stats[abbr]["gp"] or row.get("gamesPlayed", 1)
+            blocks = row.get("blockedShots", 0) or row.get("blockedShotsPerGame", 0)
+            stats[abbr]["blocks_per_gp"] = blocks / gp if blocks > 10 else blocks
+
+    # ── Penalties ─────────────────────────────────────────────────────────────
+    for row in _fetch_endpoint("penalties", season):
+        abbr = _abbr_from_row(row)
+        if abbr and abbr in stats:
+            gp = stats[abbr]["gp"] or row.get("gamesPlayed", 1)
+            pim = row.get("penaltyMinutes", 0) or row.get("pim", 0) or row.get("penaltyMinutesPerGame", 0)
+            stats[abbr]["pim_per_gp"] = pim / gp if pim > 10 else pim
+
+    # ── Save % (goalie summary — team totals) ─────────────────────────────────
+    for row in _fetch_endpoint("goaliestats", season):
+        abbr = _abbr_from_row(row)
+        if abbr and abbr in stats:
+            sv = row.get("savePct") or row.get("savePctg") or row.get("savePercentage") or 0
+            if sv and stats[abbr]["save_pct"] == 0:
+                stats[abbr]["save_pct"] = sv
+
+    # Fallback save% from shots if goaliestats didn't populate
+    for abbr, s in stats.items():
+        if s["save_pct"] == 0 and s.get("shots_against", 0) > 0:
+            # Approximate: (SA - GA) / SA
+            ga_total = s["goals_against_per_gp"] * s["gp"]
+            sa_total = s["shots_against"] * s["gp"]
+            if sa_total > 0:
+                s["save_pct"] = round((sa_total - ga_total) / sa_total, 4)
+
+    print(f"  Final: {len(stats)} teams merged across endpoints")
     return stats
 
 def fetch_nst_team_stats():
@@ -287,15 +393,15 @@ def main():
 
     print(f"  Got data for {len(nhl)} teams (NHL API), {len(nst)} teams (NST proxy)")
 
-    if not nhl:
-        print("  NHL API returned no data — falling back to existing seed file.")
+    if len(nhl) < 20:
+        print(f"  NHL API returned only {len(nhl)} teams (expected ~32) — falling back to seed file.")
         seed_path = "data/team_identity.json"
         if os.path.exists(seed_path):
-            print(f"  Seed file found at {seed_path}, keeping existing data.")
+            print(f"  Seed file found, keeping existing data.")
             return
         else:
             raise RuntimeError(
-                "NHL API returned 0 teams and no seed file exists. "
+                f"NHL API returned {len(nhl)} teams and no seed file exists. "
                 "Run src/generate_seed.py first to create data/team_identity.json."
             )
 
