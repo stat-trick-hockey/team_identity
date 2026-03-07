@@ -1,0 +1,14 @@
+{
+  "name": "nhl-team-identity",
+  "version": "1.0.0",
+  "description": "NHL Team Identity Radar",
+  "scripts": {
+    "fetch": "python3 src/fetch_data.py",
+    "seed": "python3 src/generate_seed.py",
+    "card": "node src/card_generator.js",
+    "card:all": "node src/card_generator.js --all"
+  },
+  "dependencies": {
+    "puppeteer": "^22.0.0"
+  }
+}
