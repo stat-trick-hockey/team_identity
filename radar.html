@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NHL Team Identity Radar · 2024-25</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c12;
+    --surface: #0e1520;
+    --surface2: #141d2b;
+    --border: #1e2d42;
+    --text: #e8edf5;
+    --muted: #5a6e87;
+    --accent: #4a9eff;
+    --ice: #a8d8ea;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background rink lines */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 40% at 50% 0%, rgba(74,158,255,0.04) 0%, transparent 70%),
+      linear-gradient(rgba(168,216,234,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(168,216,234,0.015) 1px, transparent 1px);
+    background-size: 100% 100%, 60px 60px, 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+
+  /* ── Header ── */
+  header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 36px 0 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .wordmark {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .wordmark-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .wordmark-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 38px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  .wordmark-title span {
+    color: var(--accent);
+  }
+
+  .header-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .season-badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    background: rgba(74,158,255,0.1);
+    border: 1px solid rgba(74,158,255,0.2);
+    padding: 4px 10px;
+    text-transform: uppercase;
+  }
+
+  .header-note {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Mode Toggle ── */
+  .mode-toggle {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 3px;
+    gap: 3px;
+    margin-bottom: 28px;
+    width: fit-content;
+  }
+
+  .mode-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 7px 20px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .mode-btn.active {
+    background: var(--accent);
+    color: #000;
+  }
+
+  /* ── Controls ── */
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+
+  .controls.single {
+    grid-template-columns: 1fr;
+    max-width: 340px;
+  }
+
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .control-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .control-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .team-select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 10px 14px;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%235a6e87' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    transition: border-color 0.2s;
+  }
+
+  .team-select:focus { outline: none; border-color: var(--accent); }
+
+  /* ── Main layout ── */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  /* ── Radar ── */
+  .radar-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 32px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .radar-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-align: center;
+    margin-bottom: 24px;
+    min-height: 28px;
+  }
+
+  #radar-svg {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .radar-legend {
+    display: flex;
+    gap: 24px;
+    margin-top: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .legend-swatch {
+    width: 24px;
+    height: 4px;
+  }
+
+  /* ── Stats panel ── */
+  .stats-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    transition: border-color 0.2s;
+  }
+
+  .stat-card:hover { border-color: var(--accent); }
+
+  .stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .stat-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .stat-rank {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  .stat-rank span {
+    color: var(--text);
+  }
+
+  .stat-bar-track {
+    height: 6px;
+    background: var(--surface2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-bar-fill {
+    height: 100%;
+    transition: width 0.6s cubic-bezier(.16,1,.3,1);
+    position: relative;
+  }
+
+  .stat-bar-fill::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: rgba(255,255,255,0.4);
+  }
+
+  .stat-values {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 11px;
+  }
+
+  .stat-val-a {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  .stat-val-b {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    text-align: right;
+  }
+
+  .stat-raw {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Tooltip ── */
+  .radar-tooltip {
+    position: absolute;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 100;
+    white-space: nowrap;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .main { grid-template-columns: 1fr; }
+    .controls { grid-template-columns: 1fr; }
+    .controls.single { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="wordmark">
+      <div class="wordmark-label">stat-trick-hockey</div>
+      <div class="wordmark-title">TEAM <span>IDENTITY</span> RADAR</div>
+    </div>
+    <div class="header-meta">
+      <div class="season-badge">2024–25 Season</div>
+      <div class="header-note">All situations · Normalized to league range</div>
+    </div>
+  </header>
+
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="btn-single" onclick="setMode('single')">Single Team</button>
+    <button class="mode-btn" id="btn-compare" onclick="setMode('compare')">Compare</button>
+  </div>
+
+  <div class="controls" id="controls">
+    <div class="control-group" id="group-a">
+      <div class="control-label"><div class="control-dot" id="dot-a"></div><span id="label-a">Select Team</span></div>
+      <select class="team-select" id="select-a" onchange="update()"></select>
+    </div>
+    <div class="control-group" id="group-b" style="display:none">
+      <div class="control-label"><div class="control-dot" id="dot-b" style="background:#ff6b6b"></div><span id="label-b">Compare Team</span></div>
+      <select class="team-select" id="select-b" onchange="update()"></select>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="radar-wrap">
+      <div class="radar-title" id="radar-title">Select a team</div>
+      <svg id="radar-svg" viewBox="0 0 480 480"></svg>
+      <div class="radar-legend" id="radar-legend"></div>
+      <div class="radar-tooltip" id="tooltip"></div>
+    </div>
+
+    <div class="stats-panel" id="stats-panel"></div>
+  </div>
+
+</div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────────
+const TEAMS_DATA = {"FLA":{"name":"Florida Panthers","abbr":"FLA","primary":"#041E42","secondary":"#C8102E","scores":{"possession":1.0,"transition":0.5045,"finishing":0.732,"physical":0.4008,"discipline":0.3991,"goaltending":0.9117,"defensive":0.8488},"raw":{"possession_shot_share":0.5453,"rush_sf60":11.17,"shooting_pct":0.1124,"hits_per_gp":21.8,"blocks_per_gp":12.5,"pim_per_gp":7.21,"save_pct":0.9064,"shots_against_per_gp":26.7,"pp_pct":22.5,"pk_pct":80.6},"ranks":{"possession":1,"transition":13,"finishing":4,"physical":23,"discipline":14,"goaltending":3,"defensive":7},"gp":58},"WSH":{"name":"Washington Capitals","abbr":"WSH","primary":"#041E42","secondary":"#C8102E","scores":{"possession":0.2225,"transition":0.882,"finishing":0.8726,"physical":0.4768,"discipline":0.3357,"goaltending":0.6837,"defensive":0.2758},"raw":{"possession_shot_share":0.5042,"rush_sf60":13.37,"shooting_pct":0.1161,"hits_per_gp":22.3,"blocks_per_gp":12.8,"pim_per_gp":7.31,"save_pct":0.9038,"shots_against_per_gp":29.5,"pp_pct":23.2,"pk_pct":80.4},"ranks":{"possession":28,"transition":3,"finishing":2,"physical":18,"discipline":18,"goaltending":11,"defensive":29},"gp":58},"DAL":{"name":"Dallas Stars","abbr":"DAL","primary":"#006847","secondary":"#8F8F8C","scores":{"possession":0.8368,"transition":0.2934,"finishing":0.6134,"physical":0.5546,"discipline":0.6701,"goaltending":0.906,"defensive":0.9198},"raw":{"possession_shot_share":0.5366,"rush_sf60":9.95,"shooting_pct":0.1092,"hits_per_gp":22.8,"blocks_per_gp":13.2,"pim_per_gp":6.8,"save_pct":0.9063,"shots_against_per_gp":26.4,"pp_pct":21.8,"pk_pct":81.4},"ranks":{"possession":5,"transition":19,"finishing":7,"physical":13,"discipline":5,"goaltending":4,"defensive":4},"gp":65},"EDM":{"name":"Edmonton Oilers","abbr":"EDM","primary":"#FF4C00","secondary":"#041E42","scores":{"possession":0.5773,"transition":1.0,"finishing":1.0,"physical":0.2202,"discipline":0.0,"goaltending":0.459,"defensive":0.1772},"raw":{"possession_shot_share":0.5229,"rush_sf60":14.05,"shooting_pct":0.1195,"hits_per_gp":20.6,"blocks_per_gp":11.7,"pim_per_gp":7.82,"save_pct":0.9012,"shots_against_per_gp":30.0,"pp_pct":23.9,"pk_pct":79.4},"ranks":{"possession":16,"transition":1,"finishing":1,"physical":31,"discipline":32,"goaltending":19,"defensive":30},"gp":60},"TOR":{"name":"Toronto Maple Leafs","abbr":"TOR","primary":"#003E7E","secondary":"#FFFFFF","scores":{"possession":0.7696,"transition":0.6179,"finishing":0.8142,"physical":0.0,"discipline":0.3209,"goaltending":0.5386,"defensive":0.3791},"raw":{"possession_shot_share":0.5331,"rush_sf60":11.83,"shooting_pct":0.1146,"hits_per_gp":19.2,"blocks_per_gp":10.8,"pim_per_gp":7.33,"save_pct":0.9021,"shots_against_per_gp":29.0,"pp_pct":22.9,"pk_pct":80.3},"ranks":{"possession":9,"transition":8,"finishing":3,"physical":32,"discipline":20,"goaltending":16,"defensive":22},"gp":58},"CAR":{"name":"Carolina Hurricanes","abbr":"CAR","primary":"#CC0000","secondary":"#000000","scores":{"possession":0.9782,"transition":0.2335,"finishing":0.4071,"physical":0.7803,"discipline":0.7464,"goaltending":0.8283,"defensive":0.9897},"raw":{"possession_shot_share":0.5441,"rush_sf60":9.6,"shooting_pct":0.1038,"hits_per_gp":24.2,"blocks_per_gp":14.1,"pim_per_gp":6.68,"save_pct":0.9054,"shots_against_per_gp":26.1,"pp_pct":20.8,"pk_pct":81.6},"ranks":{"possession":2,"transition":23,"finishing":20,"physical":7,"discipline":3,"goaltending":5,"defensive":2},"gp":59},"COL":{"name":"Colorado Avalanche","abbr":"COL","primary":"#6F263D","secondary":"#236192","scores":{"possession":0.8074,"transition":0.9259,"finishing":0.7037,"physical":0.2942,"discipline":0.1777,"goaltending":0.5169,"defensive":0.4538},"raw":{"possession_shot_share":0.5351,"rush_sf60":13.62,"shooting_pct":0.1116,"hits_per_gp":21.1,"blocks_per_gp":12.1,"pim_per_gp":7.55,"save_pct":0.9019,"shots_against_per_gp":28.6,"pp_pct":22.3,"pk_pct":79.9},"ranks":{"possession":6,"transition":2,"finishing":5,"physical":28,"discipline":25,"goaltending":17,"defensive":18},"gp":60},"VGK":{"name":"Vegas Golden Knights","abbr":"VGK","primary":"#B4975A","secondary":"#333F48","scores":{"possession":0.7923,"transition":0.2558,"finishing":0.5663,"physical":0.5523,"discipline":1.0,"goaltending":0.7636,"defensive":0.7473},"raw":{"possession_shot_share":0.5343,"rush_sf60":9.73,"shooting_pct":0.108,"hits_per_gp":22.7,"blocks_per_gp":13.2,"pim_per_gp":6.29,"save_pct":0.9047,"shots_against_per_gp":27.2,"pp_pct":21.6,"pk_pct":82.4},"ranks":{"possession":8,"transition":22,"finishing":11,"physical":14,"discipline":1,"goaltending":7,"defensive":8},"gp":59},"WPG":{"name":"Winnipeg Jets","abbr":"WPG","primary":"#041E42","secondary":"#004C97","scores":{"possession":0.9279,"transition":0.5112,"finishing":0.6609,"physical":0.6864,"discipline":0.6116,"goaltending":0.9329,"defensive":0.692},"raw":{"possession_shot_share":0.5414,"rush_sf60":11.21,"shooting_pct":0.1105,"hits_per_gp":23.6,"blocks_per_gp":13.7,"pim_per_gp":6.89,"save_pct":0.9066,"shots_against_per_gp":27.5,"pp_pct":22.1,"pk_pct":81.2},"ranks":{"possession":3,"transition":12,"finishing":6,"physical":11,"discipline":8,"goaltending":2,"defensive":10},"gp":59},"NYR":{"name":"New York Rangers","abbr":"NYR","primary":"#0038A8","secondary":"#CE1126","scores":{"possession":0.6645,"transition":0.6368,"finishing":0.5119,"physical":0.432,"discipline":0.3666,"goaltending":1.0,"defensive":0.719},"raw":{"possession_shot_share":0.5275,"rush_sf60":11.94,"shooting_pct":0.1066,"hits_per_gp":22.0,"blocks_per_gp":12.6,"pim_per_gp":7.26,"save_pct":0.9074,"shots_against_per_gp":27.4,"pp_pct":21.3,"pk_pct":80.5},"ranks":{"possession":13,"transition":7,"finishing":14,"physical":21,"discipline":16,"goaltending":1,"defensive":9},"gp":61},"MIN":{"name":"Minnesota Wild","abbr":"MIN","primary":"#154734","secondary":"#A6192E","scores":{"possession":0.8059,"transition":0.1558,"finishing":0.4388,"physical":0.8194,"discipline":0.6908,"goaltending":0.658,"defensive":1.0},"raw":{"possession_shot_share":0.535,"rush_sf60":9.15,"shooting_pct":0.1046,"hits_per_gp":24.5,"blocks_per_gp":14.3,"pim_per_gp":6.76,"save_pct":0.9035,"shots_against_per_gp":26.0,"pp_pct":20.9,"pk_pct":81.5},"ranks":{"possession":7,"transition":26,"finishing":17,"physical":5,"discipline":4,"goaltending":13,"defensive":1},"gp":64},"NJD":{"name":"New Jersey Devils","abbr":"NJD","primary":"#CE1126","secondary":"#000000","scores":{"possession":0.5948,"transition":0.7481,"finishing":0.5192,"physical":0.3475,"discipline":0.1807,"goaltending":0.4476,"defensive":0.5392},"raw":{"possession_shot_share":0.5238,"rush_sf60":12.59,"shooting_pct":0.1067,"hits_per_gp":21.4,"blocks_per_gp":12.3,"pim_per_gp":7.54,"save_pct":0.9011,"shots_against_per_gp":28.2,"pp_pct":21.3,"pk_pct":79.9},"ranks":{"possession":15,"transition":4,"finishing":13,"physical":26,"discipline":24,"goaltending":21,"defensive":16},"gp":59},"BOS":{"name":"Boston Bruins","abbr":"BOS","primary":"#FFB81C","secondary":"#000000","scores":{"possession":0.6856,"transition":0.1754,"finishing":0.5737,"physical":0.8789,"discipline":0.6292,"goaltending":0.763,"defensive":0.8803},"raw":{"possession_shot_share":0.5286,"rush_sf60":9.26,"shooting_pct":0.1082,"hits_per_gp":24.8,"blocks_per_gp":14.6,"pim_per_gp":6.86,"save_pct":0.9047,"shots_against_per_gp":26.6,"pp_pct":21.6,"pk_pct":81.3},"ranks":{"possession":12,"transition":25,"finishing":10,"physical":4,"discipline":7,"goaltending":8,"defensive":6},"gp":61},"TBL":{"name":"Tampa Bay Lightning","abbr":"TBL","primary":"#002868","secondary":"#FFFFFF","scores":{"possession":0.7066,"transition":0.6881,"finishing":0.5848,"physical":0.2775,"discipline":0.4257,"goaltending":0.6611,"defensive":0.5414},"raw":{"possession_shot_share":0.5297,"rush_sf60":12.24,"shooting_pct":0.1085,"hits_per_gp":21.0,"blocks_per_gp":12.0,"pim_per_gp":7.17,"save_pct":0.9035,"shots_against_per_gp":28.2,"pp_pct":21.7,"pk_pct":80.7},"ranks":{"possession":11,"transition":6,"finishing":8,"physical":29,"discipline":12,"goaltending":12,"defensive":15},"gp":58},"LAK":{"name":"Los Angeles Kings","abbr":"LAK","primary":"#111111","secondary":"#A2AAAD","scores":{"possession":0.9136,"transition":0.0178,"finishing":0.4189,"physical":0.6968,"discipline":0.7981,"goaltending":0.7999,"defensive":0.933},"raw":{"possession_shot_share":0.5407,"rush_sf60":8.35,"shooting_pct":0.1041,"hits_per_gp":23.7,"blocks_per_gp":13.8,"pim_per_gp":6.6,"save_pct":0.9051,"shots_against_per_gp":26.3,"pp_pct":20.8,"pk_pct":81.8},"ranks":{"possession":4,"transition":30,"finishing":18,"physical":10,"discipline":2,"goaltending":6,"defensive":3},"gp":59},"OTT":{"name":"Ottawa Senators","abbr":"OTT","primary":"#C8102E","secondary":"#C69214","scores":{"possession":0.6171,"transition":0.5644,"finishing":0.4791,"physical":0.3792,"discipline":0.1285,"goaltending":0.416,"defensive":0.3944},"raw":{"possession_shot_share":0.525,"rush_sf60":11.52,"shooting_pct":0.1057,"hits_per_gp":21.6,"blocks_per_gp":12.4,"pim_per_gp":7.62,"save_pct":0.9007,"shots_against_per_gp":28.9,"pp_pct":21.1,"pk_pct":79.8},"ranks":{"possession":14,"transition":10,"finishing":15,"physical":24,"discipline":29,"goaltending":24,"defensive":21},"gp":64},"SEA":{"name":"Seattle Kraken","abbr":"SEA","primary":"#001628","secondary":"#99D9D9","scores":{"possession":0.5694,"transition":0.3884,"finishing":0.4428,"physical":0.5222,"discipline":0.4358,"goaltending":0.7207,"defensive":0.6075},"raw":{"possession_shot_share":0.5225,"rush_sf60":10.5,"shooting_pct":0.1047,"hits_per_gp":22.5,"blocks_per_gp":13.0,"pim_per_gp":7.15,"save_pct":0.9042,"shots_against_per_gp":27.9,"pp_pct":20.9,"pk_pct":80.7},"ranks":{"possession":17,"transition":17,"finishing":16,"physical":15,"discipline":11,"goaltending":9,"defensive":14},"gp":63},"STL":{"name":"St. Louis Blues","abbr":"STL","primary":"#002F87","secondary":"#FCB514","scores":{"possession":0.4678,"transition":0.1328,"finishing":0.3119,"physical":1.0,"discipline":0.3948,"goaltending":0.6169,"defensive":0.6681},"raw":{"possession_shot_share":0.5171,"rush_sf60":9.01,"shooting_pct":0.1013,"hits_per_gp":25.6,"blocks_per_gp":15.1,"pim_per_gp":7.22,"save_pct":0.903,"shots_against_per_gp":27.6,"pp_pct":20.3,"pk_pct":80.6},"ranks":{"possession":18,"transition":27,"finishing":26,"physical":1,"discipline":15,"goaltending":14,"defensive":12},"gp":62},"VAN":{"name":"Vancouver Canucks","abbr":"VAN","primary":"#00205B","secondary":"#00843D","scores":{"possession":0.747,"transition":0.585,"finishing":0.5802,"physical":0.2697,"discipline":0.2945,"goaltending":0.7186,"defensive":0.6573},"raw":{"possession_shot_share":0.5319,"rush_sf60":11.64,"shooting_pct":0.1084,"hits_per_gp":20.9,"blocks_per_gp":12.0,"pim_per_gp":7.37,"save_pct":0.9042,"shots_against_per_gp":27.7,"pp_pct":21.7,"pk_pct":80.3},"ranks":{"possession":10,"transition":9,"finishing":9,"physical":30,"discipline":23,"goaltending":10,"defensive":13},"gp":61},"NSH":{"name":"Nashville Predators","abbr":"NSH","primary":"#FFB81C","secondary":"#041E42","scores":{"possession":0.2945,"transition":0.2591,"finishing":0.3245,"physical":0.993,"discipline":0.6004,"goaltending":0.4945,"defensive":0.6879},"raw":{"possession_shot_share":0.508,"rush_sf60":9.75,"shooting_pct":0.1016,"hits_per_gp":25.6,"blocks_per_gp":15.0,"pim_per_gp":6.9,"save_pct":0.9016,"shots_against_per_gp":27.5,"pp_pct":20.3,"pk_pct":81.2},"ranks":{"possession":25,"transition":21,"finishing":25,"physical":2,"discipline":9,"goaltending":18,"defensive":11},"gp":63},"CGY":{"name":"Calgary Flames","abbr":"CGY","primary":"#C8102E","secondary":"#F1BE48","scores":{"possession":0.405,"transition":0.4451,"finishing":0.4082,"physical":0.7681,"discipline":0.3213,"goaltending":0.4561,"defensive":0.4145},"raw":{"possession_shot_share":0.5138,"rush_sf60":10.83,"shooting_pct":0.1038,"hits_per_gp":24.1,"blocks_per_gp":14.1,"pim_per_gp":7.33,"save_pct":0.9012,"shots_against_per_gp":28.8,"pp_pct":20.8,"pk_pct":80.3},"ranks":{"possession":20,"transition":15,"finishing":19,"physical":8,"discipline":19,"goaltending":20,"defensive":20},"gp":61},"BUF":{"name":"Buffalo Sabres","abbr":"BUF","primary":"#003087","secondary":"#FFB81C","scores":{"possession":0.3983,"transition":0.7222,"finishing":0.522,"physical":0.4849,"discipline":0.1414,"goaltending":0.2494,"defensive":0.353},"raw":{"possession_shot_share":0.5135,"rush_sf60":12.44,"shooting_pct":0.1068,"hits_per_gp":22.3,"blocks_per_gp":12.9,"pim_per_gp":7.6,"save_pct":0.8988,"shots_against_per_gp":29.1,"pp_pct":21.4,"pk_pct":79.8},"ranks":{"possession":22,"transition":5,"finishing":12,"physical":16,"discipline":28,"goaltending":28,"defensive":24},"gp":62},"PHI":{"name":"Philadelphia Flyers","abbr":"PHI","primary":"#F74902","secondary":"#000000","scores":{"possession":0.3489,"transition":0.4184,"finishing":0.238,"physical":0.922,"discipline":0.0172,"goaltending":0.4235,"defensive":0.4288},"raw":{"possession_shot_share":0.5108,"rush_sf60":10.67,"shooting_pct":0.0993,"hits_per_gp":25.1,"blocks_per_gp":14.7,"pim_per_gp":7.79,"save_pct":0.9008,"shots_against_per_gp":28.7,"pp_pct":19.9,"pk_pct":79.4},"ranks":{"possession":23,"transition":16,"finishing":28,"physical":3,"discipline":31,"goaltending":23,"defensive":19},"gp":64},"NYI":{"name":"New York Islanders","abbr":"NYI","primary":"#003087","secondary":"#FC4C02","scores":{"possession":0.3985,"transition":0.0,"finishing":0.308,"physical":0.8139,"discipline":0.6524,"goaltending":0.6026,"defensive":0.8969},"raw":{"possession_shot_share":0.5135,"rush_sf60":8.24,"shooting_pct":0.1012,"hits_per_gp":24.4,"blocks_per_gp":14.3,"pim_per_gp":6.82,"save_pct":0.9029,"shots_against_per_gp":26.5,"pp_pct":20.2,"pk_pct":81.4},"ranks":{"possession":21,"transition":32,"finishing":27,"physical":6,"discipline":6,"goaltending":15,"defensive":5},"gp":60},"MTL":{"name":"Montreal Canadiens","abbr":"MTL","primary":"#AF1E2D","secondary":"#192168","scores":{"possession":0.2854,"transition":0.4879,"finishing":0.385,"physical":0.3554,"discipline":0.158,"goaltending":0.35,"defensive":0.3435},"raw":{"possession_shot_share":0.5075,"rush_sf60":11.08,"shooting_pct":0.1032,"hits_per_gp":21.5,"blocks_per_gp":12.3,"pim_per_gp":7.58,"save_pct":0.9,"shots_against_per_gp":29.2,"pp_pct":20.6,"pk_pct":79.8},"ranks":{"possession":26,"transition":14,"finishing":22,"physical":25,"discipline":27,"goaltending":27,"defensive":25},"gp":62},"DET":{"name":"Detroit Red Wings","abbr":"DET","primary":"#CE1126","secondary":"#FFFFFF","scores":{"possession":0.2978,"transition":0.3593,"finishing":0.3251,"physical":0.4683,"discipline":0.3019,"goaltending":0.429,"defensive":0.3555},"raw":{"possession_shot_share":0.5081,"rush_sf60":10.33,"shooting_pct":0.1016,"hits_per_gp":22.2,"blocks_per_gp":12.8,"pim_per_gp":7.36,"save_pct":0.9009,"shots_against_per_gp":29.1,"pp_pct":20.3,"pk_pct":80.3},"ranks":{"possession":24,"transition":18,"finishing":24,"physical":19,"discipline":22,"goaltending":22,"defensive":23},"gp":65},"PIT":{"name":"Pittsburgh Penguins","abbr":"PIT","primary":"#FCB514","secondary":"#000000","scores":{"possession":0.2779,"transition":0.525,"finishing":0.3495,"physical":0.3006,"discipline":0.1693,"goaltending":0.3565,"defensive":0.2879},"raw":{"possession_shot_share":0.5071,"rush_sf60":11.29,"shooting_pct":0.1023,"hits_per_gp":21.1,"blocks_per_gp":12.1,"pim_per_gp":7.56,"save_pct":0.9001,"shots_against_per_gp":29.4,"pp_pct":20.5,"pk_pct":79.9},"ranks":{"possession":27,"transition":11,"finishing":23,"physical":27,"discipline":26,"goaltending":26,"defensive":27},"gp":63},"UTA":{"name":"Utah Hockey Club","abbr":"UTA","primary":"#6CACE4","secondary":"#1C4B82","scores":{"possession":0.4623,"transition":0.284,"finishing":0.392,"physical":0.4682,"discipline":0.4197,"goaltending":0.394,"defensive":0.4882},"raw":{"possession_shot_share":0.5168,"rush_sf60":9.89,"shooting_pct":0.1034,"hits_per_gp":22.2,"blocks_per_gp":12.8,"pim_per_gp":7.18,"save_pct":0.9005,"shots_against_per_gp":28.5,"pp_pct":20.7,"pk_pct":80.6},"ranks":{"possession":19,"transition":20,"finishing":21,"physical":20,"discipline":13,"goaltending":25,"defensive":17},"gp":59},"CBJ":{"name":"Columbus Blue Jackets","abbr":"CBJ","primary":"#002654","secondary":"#CE1126","scores":{"possession":0.1299,"transition":0.1277,"finishing":0.223,"physical":0.7483,"discipline":0.3136,"goaltending":0.2061,"defensive":0.2859},"raw":{"possession_shot_share":0.4993,"rush_sf60":8.98,"shooting_pct":0.0989,"hits_per_gp":24.0,"blocks_per_gp":14.0,"pim_per_gp":7.34,"save_pct":0.8983,"shots_against_per_gp":29.4,"pp_pct":19.8,"pk_pct":80.3},"ranks":{"possession":29,"transition":28,"finishing":29,"physical":9,"discipline":21,"goaltending":29,"defensive":28},"gp":58},"ANA":{"name":"Anaheim Ducks","abbr":"ANA","primary":"#F47A38","secondary":"#B9975B","scores":{"possession":0.0761,"transition":0.0436,"finishing":0.0781,"physical":0.6072,"discipline":0.364,"goaltending":0.0664,"defensive":0.2922},"raw":{"possession_shot_share":0.4964,"rush_sf60":8.5,"shooting_pct":0.0951,"hits_per_gp":23.1,"blocks_per_gp":13.4,"pim_per_gp":7.26,"save_pct":0.8967,"shots_against_per_gp":29.4,"pp_pct":19.0,"pk_pct":80.5},"ranks":{"possession":30,"transition":29,"finishing":31,"physical":12,"discipline":17,"goaltending":30,"defensive":26},"gp":65},"SJS":{"name":"San Jose Sharks","abbr":"SJS","primary":"#006D75","secondary":"#EA7200","scores":{"possession":0.0,"transition":0.0032,"finishing":0.0,"physical":0.479,"discipline":0.5717,"goaltending":0.0,"defensive":0.0},"raw":{"possession_shot_share":0.4924,"rush_sf60":8.26,"shooting_pct":0.093,"hits_per_gp":22.3,"blocks_per_gp":12.8,"pim_per_gp":6.95,"save_pct":0.896,"shots_against_per_gp":30.8,"pp_pct":18.6,"pk_pct":81.1},"ranks":{"possession":32,"transition":31,"finishing":32,"physical":17,"discipline":10,"goaltending":32,"defensive":32},"gp":59},"CHI":{"name":"Chicago Blackhawks","abbr":"CHI","primary":"#CF0A2C","secondary":"#000000","scores":{"possession":0.0282,"transition":0.1769,"finishing":0.1397,"physical":0.4229,"discipline":0.0778,"goaltending":0.0403,"defensive":0.1069},"raw":{"possession_shot_share":0.4939,"rush_sf60":9.27,"shooting_pct":0.0967,"hits_per_gp":21.9,"blocks_per_gp":12.6,"pim_per_gp":7.7,"save_pct":0.8964,"shots_against_per_gp":30.3,"pp_pct":19.3,"pk_pct":79.6},"ranks":{"possession":31,"transition":24,"finishing":30,"physical":22,"discipline":30,"goaltending":31,"defensive":31},"gp":59}};
+
+const DIMS = [
+  { key: 'possession',  label: 'Possession',    raw_key: 'possession_shot_share', fmt: v => (v*100).toFixed(1)+'%',  suffix: ' shot share' },
+  { key: 'transition',  label: 'Transition',    raw_key: 'rush_sf60',             fmt: v => v.toFixed(2),            suffix: ' rush SF/60' },
+  { key: 'finishing',   label: 'Finishing',     raw_key: 'shooting_pct',          fmt: v => (v*100).toFixed(1)+'%',  suffix: ' sh%' },
+  { key: 'physical',    label: 'Physical',      raw_key: 'hits_per_gp',           fmt: v => v.toFixed(1),            suffix: ' hits/gp' },
+  { key: 'discipline',  label: 'Discipline',    raw_key: 'pim_per_gp',            fmt: v => v.toFixed(2),            suffix: ' PIM/gp' },
+  { key: 'goaltending', label: 'Goaltending',   raw_key: 'save_pct',              fmt: v => v.toFixed(3),            suffix: ' SV%' },
+  { key: 'defensive',   label: 'Defensive',     raw_key: 'shots_against_per_gp',  fmt: v => v.toFixed(1),            suffix: ' SA/gp' },
+];
+
+const COLOR_A = '#4a9eff';
+const COLOR_B = '#ff6b6b';
+
+let mode = 'single';
+
+// ── Populate selects ──────────────────────────────────────────────────────────
+function populateSelects() {
+  const sorted = Object.values(TEAMS_DATA).sort((a,b) => a.name.localeCompare(b.name));
+  ['select-a','select-b'].forEach(id => {
+    const sel = document.getElementById(id);
+    sorted.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.abbr;
+      opt.textContent = `${t.abbr} — ${t.name}`;
+      sel.appendChild(opt);
+    });
+  });
+  document.getElementById('select-a').value = 'FLA';
+  document.getElementById('select-b').value = 'EDM';
+}
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-single').classList.toggle('active', m === 'single');
+  document.getElementById('btn-compare').classList.toggle('active', m === 'compare');
+  document.getElementById('group-b').style.display = m === 'compare' ? '' : 'none';
+  document.getElementById('controls').className = 'controls' + (m === 'single' ? ' single' : '');
+  update();
+}
+
+// ── Radar drawing ─────────────────────────────────────────────────────────────
+function polarToXY(angle, r, cx, cy) {
+  return [cx + r * Math.sin(angle), cy - r * Math.cos(angle)];
+}
+
+function drawRadar(teamA, teamB) {
+  const svg = document.getElementById('radar-svg');
+  svg.innerHTML = '';
+  const W = 480, H = 480, cx = W/2, cy = H/2, R = 165, n = DIMS.length;
+
+  const ns = 'http://www.w3.org/2000/svg';
+  const g = (tag, attrs) => {
+    const el = document.createElementNS(ns, tag);
+    Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k,v));
+    return el;
+  };
+
+  // Defs
+  const defs = g('defs', {});
+  ['a','b'].forEach(id => {
+    const grad = g('radialGradient', {id:`grad-${id}`, cx:'50%', cy:'50%', r:'50%'});
+    const c = id === 'a' ? COLOR_A : COLOR_B;
+    const s1 = g('stop', {'offset':'0%', 'stop-color':c, 'stop-opacity':'0.25'});
+    const s2 = g('stop', {'offset':'100%', 'stop-color':c, 'stop-opacity':'0.05'});
+    grad.appendChild(s1); grad.appendChild(s2);
+    defs.appendChild(grad);
+  });
+  svg.appendChild(defs);
+
+  // Grid rings
+  [0.25, 0.5, 0.75, 1.0].forEach(t => {
+    const pts = DIMS.map((_,i) => {
+      const a = (2*Math.PI/n)*i;
+      const [x,y] = polarToXY(a, R*t, cx, cy);
+      return `${x},${y}`;
+    }).join(' ');
+    svg.appendChild(g('polygon', {points: pts, fill:'none', stroke:'#1e2d42', 'stroke-width':'1'}));
+    // Ring label
+    const [lx, ly] = polarToXY(0, R*t, cx, cy);
+    const lbl = g('text', {x: lx+4, y: ly-3, fill:'#2e4060', 'font-size':'9',
+      'font-family':'Barlow Condensed', 'font-weight':'600'});
+    lbl.textContent = (t*100).toFixed(0);
+    svg.appendChild(lbl);
+  });
+
+  // Axis lines + labels
+  DIMS.forEach((dim, i) => {
+    const a = (2*Math.PI/n)*i;
+    const [x1,y1] = polarToXY(a, 0, cx, cy);
+    const [x2,y2] = polarToXY(a, R, cx, cy);
+    svg.appendChild(g('line', {x1,y1,x2,y2, stroke:'#1e2d42', 'stroke-width':'1'}));
+
+    // Label
+    const [lx,ly] = polarToXY(a, R+28, cx, cy);
+    const anchor = lx < cx-5 ? 'end' : lx > cx+5 ? 'start' : 'middle';
+    const lbl = g('text', {x:lx, y:ly+4, 'text-anchor':anchor, fill:'#8aa4c0',
+      'font-family':'Barlow Condensed', 'font-weight':'700', 'font-size':'13',
+      'letter-spacing':'0.06em'});
+    lbl.textContent = dim.label.toUpperCase();
+    svg.appendChild(lbl);
+  });
+
+  // League average ring (0.5)
+  {
+    const pts = DIMS.map((_,i) => {
+      const a = (2*Math.PI/n)*i;
+      const [x,y] = polarToXY(a, R*0.5, cx, cy);
+      return `${x},${y}`;
+    }).join(' ');
+    svg.appendChild(g('polygon', {points: pts, fill:'none', stroke:'#2e4060',
+      'stroke-width':'1', 'stroke-dasharray':'4,3'}));
+  }
+
+  // Draw polygon for a team
+  function drawTeam(team, color, gradId) {
+    const scores = DIMS.map(d => team.scores[d.key]);
+    const pts = scores.map((s,i) => {
+      const a = (2*Math.PI/n)*i;
+      const [x,y] = polarToXY(a, R*s, cx, cy);
+      return `${x},${y}`;
+    }).join(' ');
+
+    // Fill
+    svg.appendChild(g('polygon', {points: pts, fill:`url(#${gradId})`, stroke:'none'}));
+    // Stroke
+    svg.appendChild(g('polygon', {points: pts, fill:'none', stroke:color,
+      'stroke-width':'2', 'stroke-linejoin':'round'}));
+
+    // Dots + invisible hit areas
+    scores.forEach((s, i) => {
+      const a = (2*Math.PI/n)*i;
+      const [x,y] = polarToXY(a, R*s, cx, cy);
+      svg.appendChild(g('circle', {cx:x, cy:y, r:'4', fill:color, stroke:'#0e1520', 'stroke-width':'2'}));
+      // Hit area
+      const hit = g('circle', {cx:x, cy:y, r:'14', fill:'transparent', style:'cursor:pointer'});
+      const dim = DIMS[i];
+      hit.addEventListener('mouseenter', (e) => showTooltip(e, team, dim, color));
+      hit.addEventListener('mouseleave', hideTooltip);
+      svg.appendChild(hit);
+    });
+  }
+
+  if (teamB && mode === 'compare') {
+    drawTeam(teamB, COLOR_B, 'grad-b');
+  }
+  drawTeam(teamA, COLOR_A, 'grad-a');
+
+  // Center dot
+  svg.appendChild(g('circle', {cx, cy, r:'3', fill:'#2e4060'}));
+}
+
+// ── Tooltip ───────────────────────────────────────────────────────────────────
+function showTooltip(e, team, dim, color) {
+  const tt = document.getElementById('tooltip');
+  const score = team.scores[dim.key];
+  const rank = team.ranks[dim.key];
+  const rawVal = team.raw[dim.raw_key];
+  tt.innerHTML = `<span style="color:${color};font-weight:700">${team.abbr}</span> · ${dim.label}<br>
+    Score: <strong>${(score*100).toFixed(0)}</strong>/100 &nbsp;·&nbsp; Rank: <strong>#${rank}</strong>/32<br>
+    <span style="color:#5a6e87">${dim.fmt(rawVal)}${dim.suffix}</span>`;
+  tt.style.opacity = '1';
+  const wrap = document.querySelector('.radar-wrap');
+  const rect = wrap.getBoundingClientRect();
+  let left = e.clientX - rect.left + 14;
+  let top  = e.clientY - rect.top + 14;
+  if (left + 200 > wrap.clientWidth) left -= 220;
+  tt.style.left = left + 'px';
+  tt.style.top  = top + 'px';
+}
+function hideTooltip() {
+  document.getElementById('tooltip').style.opacity = '0';
+}
+
+// ── Stats panel ───────────────────────────────────────────────────────────────
+function renderStats(teamA, teamB) {
+  const panel = document.getElementById('stats-panel');
+  panel.innerHTML = '';
+
+  DIMS.forEach(dim => {
+    const card = document.createElement('div');
+    card.className = 'stat-card';
+
+    const sA = teamA.scores[dim.key];
+    const rA = teamA.ranks[dim.key];
+    const rawA = teamA.raw[dim.raw_key];
+
+    if (teamB && mode === 'compare') {
+      const sB = teamB.scores[dim.key];
+      const rB = teamB.ranks[dim.key];
+      const rawB = teamB.raw[dim.raw_key];
+
+      card.innerHTML = `
+        <div class="stat-header">
+          <div class="stat-name">${dim.label}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">
+          <div style="font-size:10px;color:${COLOR_A};font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.08em">${teamA.abbr}</div>
+          <div style="font-size:10px;color:${COLOR_B};font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.08em;text-align:right">${teamB.abbr}</div>
+        </div>
+        <div class="stat-bar-track" style="margin-bottom:6px">
+          <div class="stat-bar-fill" style="width:${sA*100}%;background:${COLOR_A}"></div>
+        </div>
+        <div class="stat-bar-track">
+          <div class="stat-bar-fill" style="width:${sB*100}%;background:${COLOR_B}"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:8px">
+          <div>
+            <div class="stat-val-a" style="color:${COLOR_A}">${(sA*100).toFixed(0)}<span style="font-size:10px;font-weight:400;color:#5a6e87">/100</span></div>
+            <div class="stat-raw">#${rA} · ${dim.fmt(rawA)}${dim.suffix}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="stat-val-b" style="color:${COLOR_B}">${(sB*100).toFixed(0)}<span style="font-size:10px;font-weight:400;color:#5a6e87">/100</span></div>
+            <div class="stat-raw">#${rB} · ${dim.fmt(rawB)}${dim.suffix}</div>
+          </div>
+        </div>`;
+    } else {
+      const teamColor = teamA.primary === '#080c12' ? COLOR_A : teamA.primary;
+      card.innerHTML = `
+        <div class="stat-header">
+          <div class="stat-name">${dim.label}</div>
+          <div class="stat-rank">Rank <span>#${rA}</span>/32</div>
+        </div>
+        <div class="stat-bar-track">
+          <div class="stat-bar-fill" style="width:${sA*100}%;background:linear-gradient(90deg,${teamA.primary},${teamA.secondary || COLOR_A})"></div>
+        </div>
+        <div class="stat-values">
+          <div class="stat-val-a" style="color:${COLOR_A}">${(sA*100).toFixed(0)}<span style="font-size:10px;font-weight:400;color:#5a6e87">/100</span></div>
+          <div class="stat-raw">${dim.fmt(rawA)}${dim.suffix}</div>
+        </div>`;
+    }
+    panel.appendChild(card);
+  });
+}
+
+// ── Title / legend ────────────────────────────────────────────────────────────
+function renderTitle(teamA, teamB) {
+  const title = document.getElementById('radar-title');
+  const legend = document.getElementById('radar-legend');
+
+  if (mode === 'compare' && teamB) {
+    title.innerHTML = `<span style="color:${COLOR_A}">${teamA.abbr}</span> vs <span style="color:${COLOR_B}">${teamB.abbr}</span>`;
+    legend.innerHTML = `
+      <div class="legend-item"><div class="legend-swatch" style="background:${COLOR_A}"></div>${teamA.name}</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:${COLOR_B}"></div>${teamB.name}</div>`;
+  } else {
+    title.textContent = teamA.name;
+    legend.innerHTML = `
+      <div class="legend-item"><div class="legend-swatch" style="background:#2e4060;border-top:1px dashed #2e4060"></div>League Avg</div>`;
+  }
+}
+
+// ── Main update ───────────────────────────────────────────────────────────────
+function update() {
+  const abbA = document.getElementById('select-a').value;
+  const abbB = document.getElementById('select-b').value;
+  const teamA = TEAMS_DATA[abbA];
+  const teamB = mode === 'compare' ? TEAMS_DATA[abbB] : null;
+
+  renderTitle(teamA, teamB);
+  drawRadar(teamA, teamB);
+  renderStats(teamA, teamB);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+populateSelects();
+update();
+</script>
+</body>
+</html>
