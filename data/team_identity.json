@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-03-08T02:51:34.205156+00:00",
+    "generated": "2026-03-08T03:01:27.258750+00:00",
     "season": "2025-26",
     "season_id": "20252026",
     "situation": "All situations (NHL API)",
@@ -55,7 +55,7 @@
         "defensive": 21
       },
       "gp": 62,
-      "standings_rank": 12,
+      "standings_rank": 13,
       "points": 73,
       "wins": 35
     },
@@ -356,8 +356,8 @@
         "defensive": 27
       },
       "gp": 61,
-      "standings_rank": 13,
-      "points": 72,
+      "standings_rank": 12,
+      "points": 73,
       "wins": 32
     },
     "DAL": {
@@ -1259,7 +1259,7 @@
         "defensive": 3
       },
       "gp": 63,
-      "standings_rank": 14,
+      "standings_rank": 15,
       "points": 72,
       "wins": 29
     },
