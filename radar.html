@@ -431,7 +431,7 @@ let TEAMS_DATA = {};
 
 const DIMS = [
   { key: 'possession',  label: 'Possession',    raw_key: 'corsi_pct',            fmt: v => (v*100).toFixed(1)+'%',  suffix: ' Corsi%' },
-  { key: 'transition',  label: 'Transition',    raw_key: 'turnover_diff',        fmt: v => (v > 0 ? '+' : '') + v.toFixed(2), suffix: ' TO diff/GP' },
+  { key: 'transition',  label: 'Transition',    raw_key: 'takeaways_per_gp',     fmt: v => v.toFixed(2),            suffix: ' TK/GP' },
   { key: 'finishing',   label: 'Finishing',     raw_key: 'shooting_pct',          fmt: v => (v*100).toFixed(1)+'%',  suffix: ' sh%' },
   { key: 'physical',    label: 'Physical',      raw_key: 'hits_per_gp',           fmt: v => v.toFixed(1),            suffix: ' hits/gp' },
   { key: 'discipline',  label: 'Discipline',    raw_key: 'pim_per_gp',            fmt: v => v.toFixed(2),            suffix: ' PIM/gp' },
