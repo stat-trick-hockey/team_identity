@@ -45,9 +45,6 @@ jobs:
       - name: Install Node deps
         run: npm install
 
-      - name: Generate seed data (baseline fallback)
-        run: python src/generate_seed.py
-
       - name: Fetch live team stats
         run: python src/fetch_data.py
         # Falls back to seed data gracefully if NHL API is unreachable
