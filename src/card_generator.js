@@ -63,7 +63,8 @@ function generateCardHTML(teamA, teamB = null) {
   const axisLines = DIMS.map((d, i) => {
     const a = (2 * Math.PI / n) * i;
     const x2 = cx + R * Math.sin(a), y2 = cy - R * Math.cos(a);
-    const lx = cx + (R+32) * Math.sin(a), ly = cy - (R+32) * Math.cos(a);
+    const labelR = d.label.length > 9 ? R + 40 : R + 32;
+    const lx = cx + labelR * Math.sin(a), ly = cy - labelR * Math.cos(a);
     const anchor = lx < cx - 5 ? 'end' : lx > cx + 5 ? 'start' : 'middle';
     return `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="#1e2d42" stroke-width="1"/>
       <text x="${lx}" y="${ly+4}" text-anchor="${anchor}" fill="#6a8aaa" font-family="Barlow Condensed" font-weight="700" font-size="12" letter-spacing="0.5">${d.label}</text>`;
