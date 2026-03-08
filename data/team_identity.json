@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-03-08T02:42:20.449819+00:00",
+    "generated": "2026-03-08T02:51:34.205156+00:00",
     "season": "2025-26",
     "season_id": "20252026",
     "situation": "All situations (NHL API)",
@@ -141,7 +141,7 @@
         "defensive": 28
       },
       "gp": 63,
-      "standings_rank": 5,
+      "standings_rank": 6,
       "points": 82,
       "wins": 38
     },
@@ -442,7 +442,7 @@
         "defensive": 15
       },
       "gp": 63,
-      "standings_rank": 7,
+      "standings_rank": 8,
       "points": 77,
       "wins": 35
     },
@@ -657,9 +657,9 @@
         "defensive": 11
       },
       "gp": 61,
-      "standings_rank": 8,
-      "points": 76,
-      "wins": 33
+      "standings_rank": 7,
+      "points": 78,
+      "wins": 34
     },
     "NSH": {
       "name": "Nashville Predators",
@@ -1130,9 +1130,9 @@
         "defensive": 8
       },
       "gp": 60,
-      "standings_rank": 6,
-      "points": 80,
-      "wins": 38
+      "standings_rank": 5,
+      "points": 82,
+      "wins": 39
     },
     "TOR": {
       "name": "Toronto Maple Leafs",
