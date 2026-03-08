@@ -383,11 +383,8 @@
   }
 
   .radar-legend {
-    display: flex;
-    gap: 24px;
-    margin-top: 24px;
-    justify-content: center;
-    flex-wrap: wrap;
+    display: block;
+    margin-top: 16px;
   }
 
   .legend-item {
@@ -971,9 +968,10 @@ function renderTitle(teamA, teamB) {
 
   if (mode === 'compare' && teamB) {
     title.innerHTML = `<span style="color:${COLOR_A}">${teamA.abbr}</span> vs <span style="color:${COLOR_B}">${teamB.abbr}</span>`;
-    legend.innerHTML = `
+    legend.innerHTML = `<div style="display:flex;gap:24px;flex-wrap:wrap">
       <div class="legend-item"><div class="legend-swatch" style="background:${COLOR_A}"></div>${teamA.name}</div>
-      <div class="legend-item"><div class="legend-swatch" style="background:${COLOR_B}"></div>${teamB.name}</div>`;
+      <div class="legend-item"><div class="legend-swatch" style="background:${COLOR_B}"></div>${teamB.name}</div>
+    </div>`;
   } else {
     title.textContent = teamA.name;
 
@@ -1005,7 +1003,7 @@ function renderTitle(teamA, teamB) {
       </div>`;
     }
 
-    legend.innerHTML = callout + `<div style="margin-top:10px;display:flex;gap:16px">
+    legend.innerHTML = callout + `<div style="display:flex;gap:16px;margin-top:10px">
       <div class="legend-item"><div class="legend-swatch" style="background:#2e4060;border-top:1px dashed #2e4060"></div>League Avg</div>
     </div>`;
   }
@@ -1052,9 +1050,10 @@ const COLOR_DOWN = '#ff6b6b';
 function renderTitleDelta(team) {
   document.getElementById('radar-title').innerHTML =
     `${team.name} <span style="font-size:14px;font-weight:400;color:#5a6e87;letter-spacing:.06em">YEAR OVER YEAR</span>`;
-  document.getElementById('radar-legend').innerHTML = `
+  document.getElementById('radar-legend').innerHTML = `<div style="display:flex;gap:16px;flex-wrap:wrap">
     <div class="legend-item"><div class="legend-swatch" style="background:${COLOR_PREV};opacity:0.7"></div>2024–25</div>
-    <div class="legend-item"><div class="legend-swatch" style="background:${COLOR_CURR}"></div>2025–26</div>`;
+    <div class="legend-item"><div class="legend-swatch" style="background:${COLOR_CURR}"></div>2025–26</div>
+  </div>`;
 }
 
 function drawRadarDelta(teamCurr, teamPrev) {
@@ -1171,6 +1170,19 @@ function renderStatsDelta(teamCurr, teamPrev) {
     const rawCurrFmt = rawCurr != null ? dim.fmt(rawCurr) + dim.suffix : '—';
     const rawPrevFmt = rawPrev != null ? dim.fmt(rawPrev) + dim.suffix : '—';
 
+    // Discipline: show PIM and giveaways for both seasons
+    const discBreakdown = dim.key === 'discipline' ? `
+      <div style="display:flex;justify-content:space-between;margin:3px 0 2px">
+        <span style="font-size:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif">
+          <span style="color:#a0b4cc;font-weight:600">PIM</span> ${(teamPrev.raw.pim_per_gp??0).toFixed(2)}
+          · <span style="color:#a0b4cc;font-weight:600">GA</span> ${(teamPrev.raw.giveaways_per_gp??0).toFixed(2)}
+        </span>
+        <span style="font-size:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;text-align:right">
+          <span style="color:#a0b4cc;font-weight:600">PIM</span> ${(teamCurr.raw.pim_per_gp??0).toFixed(2)}
+          · <span style="color:#a0b4cc;font-weight:600">GA</span> ${(teamCurr.raw.giveaways_per_gp??0).toFixed(2)}
+        </span>
+      </div>` : '';
+
     const card = document.createElement('div');
     card.className = 'stat-card';
     card.innerHTML = `
@@ -1178,9 +1190,10 @@ function renderStatsDelta(teamCurr, teamPrev) {
         <div class="stat-name">${dim.label}</div>
         <div class="stat-rank">${deltaLabel}</div>
       </div>
-      <div style="position:relative;height:6px;background:var(--surface2);margin-bottom:6px">
+      <div style="position:relative;height:6px;background:var(--surface2);margin-bottom:3px">
         ${bgBar}${fgBar}
       </div>
+      ${discBreakdown}
       <div class="stat-values">
         <div>
           <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:${COLOR_PREV};font-weight:600">${(sPrev*100).toFixed(0)}</span>
