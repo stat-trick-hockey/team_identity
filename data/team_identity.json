@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-03-08T01:45:35.248925+00:00",
+    "generated": "2026-03-08T01:52:45.274446+00:00",
     "season": "2025-26",
     "season_id": "20252026",
     "situation": "All situations (NHL API)",
@@ -52,7 +52,7 @@
         "physical": 10,
         "discipline": 24,
         "goaltending": 24,
-        "defensive": 20
+        "defensive": 21
       },
       "gp": 62,
       "standings_rank": 12,
@@ -108,31 +108,31 @@
       "primary": "#003087",
       "secondary": "#FFB81C",
       "scores": {
-        "possession": 0.2252,
-        "transition": 0.6425,
-        "finishing": 0.7529,
-        "physical": 0.3471,
-        "discipline": 0.6796,
-        "goaltending": 0.8244,
-        "defensive": 0.235
+        "possession": 0.2344,
+        "transition": 0.6369,
+        "finishing": 0.7538,
+        "physical": 0.3508,
+        "discipline": 0.6842,
+        "goaltending": 0.8267,
+        "defensive": 0.2455
       },
       "raw": {
-        "corsi_pct": 0.4861,
-        "turnover_diff": -10.5,
-        "takeaways_per_gp": 5.23,
-        "giveaways_per_gp": 15.73,
+        "corsi_pct": 0.4873,
+        "turnover_diff": -10.48,
+        "takeaways_per_gp": 5.22,
+        "giveaways_per_gp": 15.7,
         "empty_net_goals": 20,
-        "shooting_pct": 0.1218,
-        "hits_per_gp": 19.06,
-        "blocks_per_gp": 15.02,
-        "pim_per_gp": 11.0,
-        "save_pct": 0.9122,
-        "shots_against_per_gp": 30.11,
+        "shooting_pct": 0.1219,
+        "hits_per_gp": 19.08,
+        "blocks_per_gp": 15.05,
+        "pim_per_gp": 10.97,
+        "save_pct": 0.9123,
+        "shots_against_per_gp": 30.03,
         "pp_pct": 0.2,
         "pk_pct": 0.83
       },
       "ranks": {
-        "possession": 20,
+        "possession": 19,
         "transition": 3,
         "finishing": 4,
         "physical": 19,
@@ -140,7 +140,7 @@
         "goaltending": 3,
         "defensive": 28
       },
-      "gp": 62,
+      "gp": 63,
       "standings_rank": 5,
       "points": 82,
       "wins": 38
@@ -667,39 +667,39 @@
       "primary": "#FFB81C",
       "secondary": "#041E42",
       "scores": {
-        "possession": 0.4056,
-        "transition": 0.648,
-        "finishing": 0.3758,
-        "physical": 0.2021,
-        "discipline": 0.7917,
-        "goaltending": 0.2881,
-        "defensive": 0.3618
+        "possession": 0.3966,
+        "transition": 0.676,
+        "finishing": 0.3694,
+        "physical": 0.1949,
+        "discipline": 0.7991,
+        "goaltending": 0.2834,
+        "defensive": 0.3723
       },
       "raw": {
-        "corsi_pct": 0.5102,
-        "turnover_diff": -9.48,
-        "takeaways_per_gp": 5.24,
-        "giveaways_per_gp": 14.73,
+        "corsi_pct": 0.509,
+        "turnover_diff": -9.41,
+        "takeaways_per_gp": 5.29,
+        "giveaways_per_gp": 14.7,
         "empty_net_goals": 13,
-        "shooting_pct": 0.103,
-        "hits_per_gp": 19.56,
-        "blocks_per_gp": 11.95,
-        "pim_per_gp": 10.44,
-        "save_pct": 0.8893,
-        "shots_against_per_gp": 29.13,
+        "shooting_pct": 0.1027,
+        "hits_per_gp": 19.49,
+        "blocks_per_gp": 11.94,
+        "pim_per_gp": 10.4,
+        "save_pct": 0.8891,
+        "shots_against_per_gp": 29.05,
         "pp_pct": 0.23,
-        "pk_pct": 0.8
+        "pk_pct": 0.81
       },
       "ranks": {
         "possession": 10,
         "transition": 2,
         "finishing": 26,
         "physical": 27,
-        "discipline": 17,
+        "discipline": 16,
         "goaltending": 23,
-        "defensive": 21
+        "defensive": 20
       },
-      "gp": 62,
+      "gp": 63,
       "standings_rank": 26,
       "points": 64,
       "wins": 28
@@ -820,7 +820,7 @@
         "pk_pct": 0.78
       },
       "ranks": {
-        "possession": 19,
+        "possession": 20,
         "transition": 21,
         "finishing": 21,
         "physical": 1,
@@ -953,7 +953,7 @@
         "transition": 7,
         "finishing": 11,
         "physical": 26,
-        "discipline": 16,
+        "discipline": 17,
         "goaltending": 6,
         "defensive": 10
       },
