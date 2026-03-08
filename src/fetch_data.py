@@ -570,7 +570,7 @@ def main():
                 "shooting_pct":          round(r["finishing"], 4),
                 "hits_per_gp":           round(nhl.get(abbr, {}).get("hits_per_gp", 0), 2),
                 "blocks_per_gp":         round(nhl.get(abbr, {}).get("blocks_per_gp", 0), 2),
-                "pim_per_gp":            round(r["discipline_raw"], 2),
+                "pim_per_gp":            round(nhl.get(abbr, {}).get("pim_per_gp", 0), 2),
                 "save_pct":              round(r["goaltending"], 4),
                 "shots_against_per_gp":  round(r["defensive_raw"], 2),
                 "pp_pct":                round(nhl.get(abbr, {}).get("pp_pct", 0), 2),
