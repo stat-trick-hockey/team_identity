@@ -45,9 +45,11 @@ jobs:
       - name: Install Node deps
         run: npm install
 
-      - name: Fetch live team stats
-        run: python src/fetch_data.py
-        # Falls back to seed data gracefully if NHL API is unreachable
+      - name: Fetch live team stats — 2025-26
+        run: python src/fetch_data.py --season 20252026
+
+      - name: Fetch live team stats — 2024-25
+        run: python src/fetch_data.py --season 20242025
 
       - name: Generate cards
         run: |
@@ -65,6 +67,6 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: weekly team identity refresh [skip ci]"
-          file_pattern: "data/team_identity.json cards/*.png"
+          file_pattern: "data/team_identity.json data/team_identity_2425.json cards/*.png"
           commit_user_name: "github-actions[bot]"
           commit_user_email: "github-actions[bot]@users.noreply.github.com"
