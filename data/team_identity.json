@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-03-08T01:30:38.474545+00:00",
+    "generated": "2026-03-08T01:39:48.910879+00:00",
     "season": "2025-26",
     "season_id": "20252026",
     "situation": "All situations (NHL API)",
@@ -485,7 +485,7 @@
         "defensive": 9
       },
       "gp": 63,
-      "standings_rank": 18,
+      "standings_rank": 19,
       "points": 68,
       "wins": 30
     },
@@ -915,9 +915,9 @@
         "defensive": 4
       },
       "gp": 61,
-      "standings_rank": 20,
-      "points": 67,
-      "wins": 28
+      "standings_rank": 17,
+      "points": 69,
+      "wins": 29
     },
     "PIT": {
       "name": "Pittsburgh Penguins",
@@ -959,7 +959,7 @@
       },
       "gp": 61,
       "standings_rank": 9,
-      "points": 75,
+      "points": 76,
       "wins": 31
     },
     "SEA": {
@@ -1001,7 +1001,7 @@
         "defensive": 23
       },
       "gp": 61,
-      "standings_rank": 19,
+      "standings_rank": 20,
       "points": 67,
       "wins": 29
     },
@@ -1302,7 +1302,7 @@
         "defensive": 18
       },
       "gp": 64,
-      "standings_rank": 17,
+      "standings_rank": 18,
       "points": 69,
       "wins": 31
     },
