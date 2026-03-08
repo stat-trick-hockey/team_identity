@@ -122,7 +122,121 @@
   .delta-down { color: #ff6b6b; font-size: 11px; margin-left: 4px; }
   .delta-flat { color: var(--muted); font-size: 11px; margin-left: 4px; }
 
-  /* ── Season Toggle ── */
+  /* ── Glossary ── */
+  .glossary-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .glossary-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .glossary-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(8,12,18,0.88);
+    z-index: 100;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px;
+    overflow-y: auto;
+  }
+  .glossary-overlay.open { display: flex; }
+
+  .glossary-modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    max-width: 720px;
+    width: 100%;
+    padding: 32px;
+    position: relative;
+  }
+
+  .glossary-modal h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .glossary-modal .g-subtitle {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .glossary-section-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 24px 0 12px;
+  }
+
+  .glossary-term {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 12px 20px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: start;
+  }
+  .glossary-term:last-child { border-bottom: none; }
+
+  .g-term {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--text);
+  }
+  .g-tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-top: 2px;
+  }
+  .g-def {
+    font-size: 13px;
+    color: #a0b4cc;
+    line-height: 1.6;
+  }
+  .g-def strong { color: var(--text); font-weight: 600; }
+
+  .glossary-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px 8px;
+    transition: color 0.2s;
+  }
+  .glossary-close:hover { color: var(--text); }
   .season-toggle {
     display: flex;
     background: var(--surface);
@@ -432,6 +546,7 @@
       <button class="season-btn" id="btn-2425" onclick="setSeason('2425')">2024–25</button>
       <button class="season-btn delta-btn" id="btn-delta" onclick="setSeason('delta')">Δ Delta</button>
     </div>
+    <button class="glossary-btn" onclick="document.getElementById('glossary-overlay').classList.add('open')">? Glossary</button>
   </div>
 
   <div class="controls" id="controls">
@@ -456,6 +571,93 @@
     <div class="stats-panel" id="stats-panel"></div>
   </div>
 
+</div>
+
+<!-- ── Glossary Modal ─────────────────────────────────────────────────────── -->
+<div class="glossary-overlay" id="glossary-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="glossary-modal">
+    <button class="glossary-close" onclick="document.getElementById('glossary-overlay').classList.remove('open')">✕</button>
+    <h2>Glossary</h2>
+    <div class="g-subtitle">Dimensions, metrics, and concepts used in this visualization</div>
+
+    <div class="glossary-section-title">The 7 Dimensions</div>
+
+    <div class="glossary-term">
+      <div><span class="g-term">Possession</span><span class="g-tag">Corsi% · All-sit</span></div>
+      <div class="g-def">Measures <strong>shot attempt share</strong> — the percentage of all shot attempts (on net, missed, and blocked) taken by the team while both teams are at even strength. Also known as Corsi%. A value above 50% means the team controls the puck more than its opponents. Source: NHL API <code>/realtime</code> <code>satPct</code>.</div>
+    </div>
+
+    <div class="glossary-term">
+      <div><span class="g-term">Transition</span><span class="g-tag">Takeaways / GP</span></div>
+      <div class="g-def">Counts <strong>takeaways per game</strong> — how often a team's players strip or intercept the puck from opponents. Higher values indicate a more aggressive, puck-hunting forecheck and defensive zone presence. Source: NHL API <code>/realtime</code> <code>takeaways</code>.</div>
+    </div>
+
+    <div class="glossary-term">
+      <div><span class="g-term">Finishing</span><span class="g-tag">Shooting % · All-sit</span></div>
+      <div class="g-def">Goals scored divided by shots on goal. Reflects a team's <strong>ability to convert chances</strong> into goals. Influenced by shooter skill, shot quality, and goaltending faced. Sustained outliers regress toward the league mean (~10.5%). Source: NHL API <code>/summary</code>.</div>
+    </div>
+
+    <div class="glossary-term">
+      <div><span class="g-term">Physical</span><span class="g-tag">Hits + Blocks / GP</span></div>
+      <div class="g-def">A weighted blend of <strong>hits per game (60%)</strong> and <strong>blocked shots per game (40%)</strong>. Captures two distinct physical identities: body contact aggression and defensive shot-suppression willingness. Source: NHL API <code>/realtime</code>.</div>
+    </div>
+
+    <div class="glossary-term">
+      <div><span class="g-term">Discipline</span><span class="g-tag">PIM/GP · Giveaways/GP</span></div>
+      <div class="g-def">A blended measure of <strong>decision-making under pressure</strong>. Combines penalty minutes per game (70%) and giveaways per game (30%), both inverted — lower is better. A disciplined team stays out of the box <em>and</em> protects the puck. Source: NHL API <code>/penalties</code> and <code>/realtime</code>.</div>
+    </div>
+
+    <div class="glossary-term">
+      <div><span class="g-term">Goaltending</span><span class="g-tag">SV% · ENG-adjusted</span></div>
+      <div class="g-def"><strong>Save percentage</strong> derived from goals against and shots against, with <strong>empty net goals stripped out</strong> before calculation. Empty net goals inflate a team's GA without reflecting goalie performance, so removing them produces a cleaner read on true netminder quality. Source: NHL API <code>/summary</code> + <code>/realtime</code> <code>emptyNetGoals</code>.</div>
+    </div>
+
+    <div class="glossary-term">
+      <div><span class="g-term">Defensive</span><span class="g-tag">Shots Against / GP</span></div>
+      <div class="g-def">Shots on goal allowed per game, <strong>inverted</strong> so that lower SA/GP scores higher. Reflects how well a team's defensive structure limits quality looks — independent of whether those shots go in. Distinct from goaltending, which measures what happens after shots are allowed. Source: NHL API <code>/summary</code>.</div>
+    </div>
+
+    <div class="glossary-section-title">Scores &amp; Rankings</div>
+
+    <div class="glossary-term">
+      <div><span class="g-term">Score (0–100)</span><span class="g-tag">Normalized</span></div>
+      <div class="g-def">Each raw metric is <strong>min-max normalized</strong> to a 0–1 scale (shown as 0–100 in the UI) relative to the league range that season. A score of 100 means the best team in the league on that dimension; 0 means the worst. Scores are <em>not</em> comparable across seasons without the delta view.</div>
+    </div>
+
+    <div class="glossary-term">
+      <div><span class="g-term">Rank #N/32</span><span class="g-tag">1 = best</span></div>
+      <div class="g-def">Each team's <strong>ordinal position</strong> among all 32 teams for a given dimension. Rank #1 is the league leader; #32 is last. Ties are broken by the raw metric value.</div>
+    </div>
+
+    <div class="glossary-term">
+      <div><span class="g-term">Process Rank</span><span class="g-tag">Derived</span></div>
+      <div class="g-def">The team's overall rank when all 7 dimension ranks are <strong>averaged and re-ranked</strong> against the other 31 teams. This produces a single 1–32 "process quality" number on the same scale as standings, enabling a direct comparison.</div>
+    </div>
+
+    <div class="glossary-section-title">Process vs. Results</div>
+
+    <div class="glossary-term">
+      <div><span class="g-term">Standings Rank</span><span class="g-tag">Points · Regular season</span></div>
+      <div class="g-def">The team's position in the overall NHL standings by <strong>points</strong> at the time the data was last fetched. Ties use the NHL's standard tiebreaker rules (regulation wins, then OT wins).</div>
+    </div>
+
+    <div class="glossary-term">
+      <div><span class="g-term">Outperforming</span><span class="g-tag">Orange badge</span></div>
+      <div class="g-def">Standings rank is <strong>better (lower number) than Process Rank</strong> by more than 3 spots. The team is getting more wins than their underlying metrics would predict — often a sign of strong goaltending, clutch performance, or good fortune in close games. Regression risk.</div>
+    </div>
+
+    <div class="glossary-term">
+      <div><span class="g-term">Underperforming</span><span class="g-tag">Green badge</span></div>
+      <div class="g-def">Standings rank is <strong>worse (higher number) than Process Rank</strong> by more than 3 spots. The team's underlying metrics are better than their point total suggests — often caused by poor shooting luck, goaltending variance, or bad timing on penalties. Positive regression candidate.</div>
+    </div>
+
+    <div class="glossary-section-title">Delta View (Δ)</div>
+
+    <div class="glossary-term">
+      <div><span class="g-term">Delta (Δ)</span><span class="g-tag">Year-over-year</span></div>
+      <div class="g-def">Shows the <strong>change in normalized scores</strong> between 2024–25 and 2025–26 for each dimension. The dashed polygon is the prior season; the solid polygon is the current season. Green arrows (↑) indicate improvement; red arrows (↓) indicate decline. Values are shown as prior → current in the stat panel.</div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -577,8 +779,9 @@ function drawRadar(teamA, teamB) {
     const [x2,y2] = polarToXY(a, R, cx, cy);
     svg.appendChild(g('line', {x1,y1,x2,y2, stroke:'#1e2d42', 'stroke-width':'1'}));
 
-    // Label
-    const [lx,ly] = polarToXY(a, R+32, cx, cy);
+    // Label — give longer labels extra clearance to avoid clipping
+    const labelR = dim.label.length > 9 ? R + 40 : R + 32;
+    const [lx,ly] = polarToXY(a, labelR, cx, cy);
     const anchor = lx < cx-5 ? 'end' : lx > cx+5 ? 'start' : 'middle';
     const lbl = g('text', {x:lx, y:ly+4, 'text-anchor':anchor, fill:'#8aa4c0',
       'font-family':'Barlow Condensed', 'font-weight':'700', 'font-size':'12',
@@ -671,12 +874,19 @@ function renderStats(teamA, teamB) {
     const rA = teamA.ranks[dim.key];
     const rawA = teamA.raw[dim.raw_key];
     const rawAFmt = (rawA != null && !isNaN(rawA)) ? dim.fmt(rawA) + dim.suffix : '—';
+    // Discipline shows both PIM and giveaways (blended metric)
+    const rawAExtra = dim.key === 'discipline'
+      ? ` · ${(teamA.raw.giveaways_per_gp ?? '—').toFixed ? teamA.raw.giveaways_per_gp.toFixed(2) : '—'} GA/gp`
+      : '';
 
     if (teamB && mode === 'compare') {
       const sB = teamB.scores[dim.key];
       const rB = teamB.ranks[dim.key];
       const rawB = teamB.raw[dim.raw_key];
       const rawBFmt = (rawB != null && !isNaN(rawB)) ? dim.fmt(rawB) + dim.suffix : '—';
+      const rawBExtra = dim.key === 'discipline'
+        ? ` · ${(teamB.raw.giveaways_per_gp ?? '—').toFixed ? teamB.raw.giveaways_per_gp.toFixed(2) : '—'} GA/gp`
+        : '';
 
       card.innerHTML = `
         <div class="stat-header">
@@ -695,11 +905,11 @@ function renderStats(teamA, teamB) {
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:8px">
           <div>
             <div class="stat-val-a" style="color:${COLOR_A}">${(sA*100).toFixed(0)}<span style="font-size:10px;font-weight:400;color:#5a6e87">/100</span></div>
-            <div class="stat-raw">#${rA} · ${rawAFmt}</div>
+            <div class="stat-raw">#${rA} · ${rawAFmt}${rawAExtra}</div>
           </div>
           <div style="text-align:right">
             <div class="stat-val-b" style="color:${COLOR_B}">${(sB*100).toFixed(0)}<span style="font-size:10px;font-weight:400;color:#5a6e87">/100</span></div>
-            <div class="stat-raw">#${rB} · ${rawBFmt}</div>
+            <div class="stat-raw">#${rB} · ${rawBFmt}${rawBExtra}</div>
           </div>
         </div>`;
     } else {
@@ -714,7 +924,7 @@ function renderStats(teamA, teamB) {
         </div>
         <div class="stat-values">
           <div class="stat-val-a" style="color:${COLOR_A}">${(sA*100).toFixed(0)}<span style="font-size:10px;font-weight:400;color:#5a6e87">/100</span></div>
-          <div class="stat-raw">${rawAFmt}</div>
+          <div class="stat-raw">${rawAFmt}${rawAExtra}</div>
         </div>`;
     }
     panel.appendChild(card);
@@ -850,7 +1060,8 @@ function drawRadarDelta(teamCurr, teamPrev) {
     const a=(2*Math.PI/n)*i;
     const [x2,y2]=[cx+R*Math.sin(a), cy-R*Math.cos(a)];
     svg.appendChild(g('line', {x1:cx,y1:cy,x2,y2,stroke:'#1e2d42','stroke-width':'1'}));
-    const [lx,ly]=[cx+(R+32)*Math.sin(a), cy-(R+32)*Math.cos(a)];
+    const labelR = dim.label.length > 9 ? R + 40 : R + 32;
+    const [lx,ly]=[cx+labelR*Math.sin(a), cy-labelR*Math.cos(a)];
     const anchor = lx<cx-5?'end':lx>cx+5?'start':'middle';
 
     const sCurr = teamCurr.scores[dim.key];
