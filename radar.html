@@ -682,10 +682,10 @@ function renderTitle(teamA, teamB) {
 
     // Process vs Results callout
     const sr = teamA.standings_rank;
-    const pr = Math.round(Object.values(teamA.ranks).reduce((a,b) => a+b, 0) / 7);
-    const divergence = sr - pr;
+    const pr = teamA._process_rank;
+    const divergence = sr != null && pr != null ? sr - pr : null;
     let callout = '';
-    if (sr != null) {
+    if (sr != null && pr != null) {
       const divColor  = divergence > 3 ? '#ff9f43' : divergence < -3 ? '#5ddb8a' : 'var(--muted)';
       const divLabel  = divergence > 3
         ? `Outperforming process by ${divergence} spots`
@@ -699,7 +699,7 @@ function renderTitle(teamA, teamB) {
           <span style="color:var(--muted)"> · ${teamA.points}pts</span>
         </div>
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;background:var(--surface2);border:1px solid var(--border);padding:5px 12px">
-          <span style="color:var(--muted);letter-spacing:.08em">PROCESS AVG </span>
+          <span style="color:var(--muted);letter-spacing:.08em">PROCESS RANK </span>
           <span style="color:var(--text);font-weight:700;font-size:15px">#${pr}</span>
         </div>
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;background:var(--surface2);border:1px solid ${divColor}33;padding:5px 12px;color:${divColor}">
@@ -736,6 +736,18 @@ fetch('data/team_identity.json')
   })
   .then(data => {
     TEAMS_DATA = data.teams;
+
+    // Rank each team's process (avg dimension rank) against all 32 teams.
+    // Lower avg rank = better process = lower process rank number.
+    const avgRanks = Object.entries(TEAMS_DATA).map(([abbr, t]) => ({
+      abbr,
+      avg: Object.values(t.ranks).reduce((a, b) => a + b, 0) / Object.values(t.ranks).length
+    }));
+    avgRanks.sort((a, b) => a.avg - b.avg);  // ascending: best process first
+    avgRanks.forEach((entry, i) => {
+      TEAMS_DATA[entry.abbr]._process_rank = i + 1;
+    });
+
     populateSelects();
     update();
   })
