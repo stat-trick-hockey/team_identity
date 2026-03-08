@@ -123,6 +123,42 @@ def raw_stats(abbr):
         "pk_pct":                round(75 + r["discipline"] * 8, 1),
     }
 
+# Approximate 2025-26 standings ranks (points-based, realistic estimates)
+STANDINGS_RANKS = {
+    "FLA": {"standings_rank": 1,  "points": 98,  "wins": 46},
+    "WPG": {"standings_rank": 2,  "points": 94,  "wins": 44},
+    "CAR": {"standings_rank": 3,  "points": 93,  "wins": 43},
+    "DAL": {"standings_rank": 4,  "points": 91,  "wins": 42},
+    "COL": {"standings_rank": 5,  "points": 89,  "wins": 41},
+    "LAK": {"standings_rank": 6,  "points": 87,  "wins": 40},
+    "MIN": {"standings_rank": 7,  "points": 86,  "wins": 40},
+    "VGK": {"standings_rank": 8,  "points": 85,  "wins": 39},
+    "EDM": {"standings_rank": 9,  "points": 84,  "wins": 39},
+    "NYR": {"standings_rank": 10, "points": 83,  "wins": 38},
+    "TBL": {"standings_rank": 11, "points": 82,  "wins": 38},
+    "TOR": {"standings_rank": 12, "points": 81,  "wins": 37},
+    "BOS": {"standings_rank": 13, "points": 80,  "wins": 37},
+    "VAN": {"standings_rank": 14, "points": 78,  "wins": 36},
+    "NJD": {"standings_rank": 15, "points": 76,  "wins": 35},
+    "WSH": {"standings_rank": 16, "points": 75,  "wins": 35},
+    "OTT": {"standings_rank": 17, "points": 74,  "wins": 34},
+    "SEA": {"standings_rank": 18, "points": 72,  "wins": 33},
+    "NYI": {"standings_rank": 19, "points": 70,  "wins": 32},
+    "STL": {"standings_rank": 20, "points": 68,  "wins": 31},
+    "SJS": {"standings_rank": 21, "points": 66,  "wins": 30},
+    "CGY": {"standings_rank": 22, "points": 65,  "wins": 30},
+    "DET": {"standings_rank": 23, "points": 64,  "wins": 29},
+    "UTA": {"standings_rank": 24, "points": 63,  "wins": 29},
+    "BUF": {"standings_rank": 25, "points": 61,  "wins": 28},
+    "MTL": {"standings_rank": 26, "points": 59,  "wins": 27},
+    "NSH": {"standings_rank": 27, "points": 57,  "wins": 26},
+    "PIT": {"standings_rank": 28, "points": 55,  "wins": 25},
+    "PHI": {"standings_rank": 29, "points": 53,  "wins": 24},
+    "CBJ": {"standings_rank": 30, "points": 50,  "wins": 23},
+    "ANA": {"standings_rank": 31, "points": 47,  "wins": 21},
+    "CHI": {"standings_rank": 32, "points": 44,  "wins": 20},
+}
+
 output = {
     "meta": {
         "generated": datetime.utcnow().isoformat() + "Z",
@@ -145,6 +181,9 @@ for abbr in ARCHETYPES:
         "raw":       raw_stats(abbr),
         "ranks":     {d: ranks[d][abbr] for d in DIMS},
         "gp":        random.randint(58, 65),
+        "standings_rank": STANDINGS_RANKS.get(abbr, {}).get("standings_rank", None),
+        "points":         STANDINGS_RANKS.get(abbr, {}).get("points", None),
+        "wins":           STANDINGS_RANKS.get(abbr, {}).get("wins", None),
     }
 
 with open("data/team_identity.json", "w") as f:

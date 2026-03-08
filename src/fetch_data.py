@@ -159,113 +159,101 @@ def fetch_standings(season="20252026"):
 
 def fetch_nhl_team_stats(season="20252026"):
     """
-    Pull team stats from NHL API endpoints.
-    Summary is confirmed working. Secondary endpoints probed with field logging.
-    Save% derived from GA/SA in summary as fallback.
+    Pull team stats from confirmed-working NHL API endpoints.
+
+    Confirmed fields (2025-26):
+      summary:  faceoffWinPct, gamesPlayed, goalsAgainst, goalsAgainstPerGame,
+                goalsFor, goalsForPerGame, penaltyKillPct, powerPlayPct,
+                shotsAgainstPerGame, shotsForPerGame, points, wins
+      realtime: hits, blockedShots, satPct (Corsi% — best possession proxy)
+      penalties: penaltyMinutes
+      save%:    derived from summary goalsAgainst / shotsAgainstPerGame * gamesPlayed
     """
     stats = {}
 
-    # ── Summary (GP, goals, PP, PK) ──────────────────────────────────────────
+    # ── Summary ───────────────────────────────────────────────────────────────
     for row in _fetch_endpoint("summary", season):
         abbr = _abbr_from_row(row)
         if not abbr:
             continue
+        gp  = row.get("gamesPlayed", 0)
+        ga  = row.get("goalsAgainst", 0)
+        sa  = row.get("shotsAgainstPerGame", 0)
+        sa_total = sa * gp
+        save_pct = round((sa_total - ga) / sa_total, 4) if sa_total > 0 else 0
+
         stats[abbr] = {
-            "gp":           row.get("gamesPlayed", 0),
-            "goals_per_gp": row.get("goalsForPerGame", 0),
-            "goals_against_per_gp": row.get("goalsAgainstPerGame", 0),
-            "shots_per_gp": row.get("shotsForPerGame", 0),
-            "shots_against": row.get("shotsAgainstPerGame", 0),
-            "pp_pct":       row.get("penaltyKillPct", 0),   # note: field swap below
-            "pk_pct":       row.get("penaltyKillPct", 0),
-            # will be filled by other endpoints
-            "hits_per_gp":   0,
-            "blocks_per_gp": 0,
-            "pim_per_gp":    0,
-            "save_pct":      0,
+            "gp":                    gp,
+            "goals_per_gp":          row.get("goalsForPerGame", 0),
+            "goals_against_per_gp":  row.get("goalsAgainstPerGame", 0),
+            "shots_per_gp":          row.get("shotsForPerGame", 0),
+            "shots_against":         sa,
+            "pp_pct":                row.get("powerPlayPct") or 0,
+            "pk_pct":                row.get("penaltyKillPct") or 0,
+            "faceoff_pct":           row.get("faceoffWinPct") or 0,
+            "points":                row.get("points") or 0,
+            "wins":                  row.get("wins") or 0,
+            # save% computed after /realtime so we can strip empty-net goals
+            "save_pct":              0,
+            "_ga_total":             ga,        # scratch field, removed before output
+            "_sa_total":             sa * gp,   # scratch field
+            # filled by /realtime
+            "hits_per_gp":           0,
+            "blocks_per_gp":         0,
+            "corsi_pct":             0,
+            "takeaways_per_gp":      0,
+            "giveaways_per_gp":      0,
+            "turnover_diff":         0,
+            "empty_net_goals":       0,
+            # filled by /penalties
+            "pim_per_gp":            0,
         }
-        # PP% and PK% live in separate fields
-        stats[abbr]["pp_pct"] = row.get("powerPlayPct") or row.get("ppPct") or 0
-        stats[abbr]["pk_pct"] = row.get("penaltyKillPct") or row.get("pkPct") or 0
 
-    if stats:
-        sample = list(stats.values())[0]
-        print(f"  Summary: {len(stats)} teams, sample GP={sample['gp']}")
-        # Always dump fields + one raw row so we can see what's available
-        raw_rows = _fetch_endpoint("summary", season)
-        if raw_rows:
-            print(f"  SUMMARY FIELDS: {list(raw_rows[0].keys())}")
-            print(f"  SAMPLE ROW: {raw_rows[0]}")
-    else:
-        print("  Summary endpoint returned 0 teams — printing raw sample")
-        raw_rows = _fetch_endpoint("summary", season)
-        if raw_rows:
-            print(f"  SUMMARY FIELDS: {list(raw_rows[0].keys())}")
-            print(f"  SAMPLE ROW: {raw_rows[0]}")
+    if not stats:
+        print("  Summary endpoint returned 0 teams")
         return stats
+    print(f"  Summary: {len(stats)} teams, save% derived from GA/SA")
 
-    def _probe(candidates, stat_key, row_keys, per_game=True):
-        """Try each endpoint name in order; on first success log fields and fill stats."""
-        for ep in candidates:
-            rows = _fetch_endpoint(ep, season)
-            if not rows:
-                continue
-            print(f"  PROBE /{ep} FIELDS: {list(rows[0].keys())}")
-            print(f"  PROBE /{ep} SAMPLE: {rows[0]}")
-            filled = 0
-            for row in rows:
-                abbr = _abbr_from_row(row)
-                if not abbr or abbr not in stats:
-                    continue
-                gp = stats[abbr]["gp"] or row.get("gamesPlayed", 1)
-                val = 0
-                for k in row_keys:
-                    val = row.get(k, 0)
-                    if val:
-                        break
-                if val:
-                    stats[abbr][stat_key] = val / gp if (per_game and val > 10) else val
-                    filled += 1
-            print(f"  {stat_key}: {filled} teams filled from /{ep}")
-            if filled > 20:
-                return  # good enough
-        # All endpoints failed — derive save% from summary if needed
-        if stat_key == "save_pct":
-            for abbr, s in stats.items():
-                if s["save_pct"] == 0 and s.get("shots_against", 0) > 0:
-                    ga_total = s["goals_against_per_gp"] * s["gp"]
-                    sa_total = s["shots_against"] * s["gp"]
-                    if sa_total > 0:
-                        s["save_pct"] = round((sa_total - ga_total) / sa_total, 4)
-            sv_filled = sum(1 for s in stats.values() if s["save_pct"] > 0)
-            print(f"  save_pct: derived from summary GA/SA for {sv_filled} teams")
-        else:
-            print(f"  WARNING: {stat_key} could not be filled from any endpoint")
+    # ── Realtime (hits, blockedShots, satPct/Corsi, takeaways, giveaways, ENG) ─
+    for row in _fetch_endpoint("realtime", season):
+        abbr = _abbr_from_row(row)
+        if not abbr or abbr not in stats:
+            continue
+        gp = stats[abbr]["gp"] or row.get("gamesPlayed", 1)
+        stats[abbr]["hits_per_gp"]       = round(row.get("hits", 0) / gp, 2)
+        stats[abbr]["blocks_per_gp"]     = round(row.get("blockedShots", 0) / gp, 2)
+        stats[abbr]["corsi_pct"]         = row.get("satPct", 0)
+        stats[abbr]["takeaways_per_gp"]  = round(row.get("takeaways", 0) / gp, 2)
+        stats[abbr]["giveaways_per_gp"]  = round(row.get("giveaways", 0) / gp, 2)
+        stats[abbr]["turnover_diff"]     = round(
+            (row.get("takeaways", 0) - row.get("giveaways", 0)) / gp, 2
+        )
+        stats[abbr]["empty_net_goals"]   = row.get("emptyNetGoals", 0)
+    rt_filled = sum(1 for s in stats.values() if s["hits_per_gp"] > 0)
+    print(f"  Realtime: {rt_filled} teams (hits, blocks, Corsi%, takeaways/giveaways, ENG)")
 
-    # ── Probe each secondary stat ─────────────────────────────────────────────
-    _probe(
-        ["hits", "realtime", "teamstats"],
-        "hits_per_gp",
-        ["hits", "hitsPerGame", "hitsFor"],
-    )
-    _probe(
-        ["blockshots", "blockedshots", "realtime"],
-        "blocks_per_gp",
-        ["blockedShots", "blockedShotsPerGame", "blockedShotsFor"],
-    )
-    _probe(
-        ["penalties", "penaltykill"],
-        "pim_per_gp",
-        ["penaltyMinutes", "pim", "penaltyMinutesPerGame", "penaltiesFor"],
-    )
-    _probe(
-        ["goaliestats", "goaliesummary", "goalie"],
-        "save_pct",
-        ["savePct", "savePctg", "savePercentage", "savePctAllSituations"],
-    )
+    # ── Save% — derived from summary GA/SA with empty-net goals stripped ──────
+    for abbr, s in stats.items():
+        ga_adj   = s["_ga_total"] - s["empty_net_goals"]
+        sa_total = s["_sa_total"]
+        s["save_pct"] = round((sa_total - ga_adj) / sa_total, 4) if sa_total > 0 else 0
+    sv_filled = sum(1 for s in stats.values() if s["save_pct"] > 0)
+    print(f"  Save%: {sv_filled} teams (ENG-adjusted from GA/SA)")
+
+    # ── Penalties (PIM) ───────────────────────────────────────────────────────
+    for row in _fetch_endpoint("penalties", season):
+        abbr = _abbr_from_row(row)
+        if not abbr or abbr not in stats:
+            continue
+        gp  = stats[abbr]["gp"] or row.get("gamesPlayed", 1)
+        pim = row.get("penaltyMinutes", 0)
+        stats[abbr]["pim_per_gp"] = round(pim / gp, 2) if pim else 0
+    pim_filled = sum(1 for s in stats.values() if s["pim_per_gp"] > 0)
+    print(f"  Penalties: {pim_filled} teams (PIM/GP)")
 
     print(f"  Final: {len(stats)} teams merged")
     return stats
+
 
 def fetch_nst_team_stats():
     """
@@ -330,6 +318,14 @@ def fetch_nst_team_stats():
         table_match = re.search(r'<table[^>]*id=["\']teams["\'][^>]*>(.*?)</table>',
                                 body, re.DOTALL | re.IGNORECASE)
         if not table_match:
+            # Log what we actually got to diagnose the failure
+            print(f"  NST response length: {len(body)} chars")
+            print(f"  NST first 300 chars: {body[:300]!r}")
+            all_table_ids = re.findall(r'<table[^>]*id=["\']([^"\']+)["\']', body, re.IGNORECASE)
+            print(f"  NST table IDs found: {all_table_ids}")
+            for kw in ["cloudflare", "captcha", "blocked", "login", "sign in", "javascript"]:
+                if kw.lower() in body.lower():
+                    print(f"  NST ⚠ keyword in response: '{kw}'")
             raise ValueError("NST team table not found in response")
 
         table_html = table_match.group(1)
@@ -416,24 +412,36 @@ def build_dimensions(nhl: dict, nst: dict) -> dict:
         s = nst.get(abbr, {})
         if not n and not s:
             continue
+
+        # Possession: use Corsi% (satPct) from /realtime — best available proxy.
+        # Falls back to shots-for share if corsi unavailable.
+        corsi = n.get("corsi_pct", 0)
+        if not corsi and n.get("shots_per_gp") and n.get("shots_against"):
+            sf = n.get("shots_per_gp", 0)
+            sa = n.get("shots_against", 0)
+            corsi = sf / (sf + sa) if (sf + sa) > 0 else 0.5
+
+        # Shooting%: goals-for / shots-for
+        gf  = n.get("goals_per_gp", 0)
+        sf  = n.get("shots_per_gp", 1)
+        shooting_pct = s.get("shooting_pct") or (gf / sf if sf else 0)
+
         dims[abbr] = {
-            # 1. Possession — shot share proxy
-            "possession":   s.get("possession_proxy", 0.5),
-            # 2. Transition — rush shot attempts for per 60 (NST); falls back to
-            #    GF/SA rate proxy if NST scrape failed
-            "transition":   (s.get("rush_sf60") if s.get("rush_sf60") is not None
-                             else (s.get("gf_per_gp", 0) / max(s.get("sa_per_gp", 30), 1)) * 10),
-            # 3. Finishing — shooting percentage (goals / shots on goal)
-            "finishing":    s.get("shooting_pct", 0),
-            # 4. Physical — hits + blocked shots per gp combined
-            "physical":     n.get("hits_per_gp", 0) * 0.6 + n.get("blocks_per_gp", 0) * 0.4,
-            # 5. Discipline — inverse of PIM (lower PIM = more disciplined)
-            #    We'll invert after normalization
-            "discipline_raw": n.get("pim_per_gp", 0),
-            # 6. Goaltending — save %
-            "goaltending":  n.get("save_pct", 0),
-            # 7. Defensive structure — inverse of shots against per gp
-            "defensive_raw": n.get("shots_against", 0),
+            # 1. Possession — Corsi% (shot attempt share all-sit) from /realtime
+            "possession":     corsi,
+            # 2. Transition — net turnover differential per GP (takeaways - giveaways)
+            "transition":     n.get("turnover_diff", 0),
+            # 3. Finishing — shooting %
+            "finishing":      shooting_pct,
+            # 4. Physical — hits + blocked shots per GP
+            "physical":       n.get("hits_per_gp", 0) * 0.6 + n.get("blocks_per_gp", 0) * 0.4,
+            # 5. Discipline — PIM/GP (70%) + giveaways/GP (30%), both inverted.
+            #    Captures both penalty-taking and puck-management carelessness.
+            "discipline_raw": n.get("pim_per_gp", 0) * 0.7 + n.get("giveaways_per_gp", 0) * 0.3,
+            # 6. Goaltending — ENG-adjusted save% (empty net goals stripped from GA)
+            "goaltending":    n.get("save_pct", 0),
+            # 7. Defensive — raw shots against/GP (inverted after normalization)
+            "defensive_raw":  n.get("shots_against", 0),
         }
     return dims
 
@@ -465,6 +473,11 @@ def main():
             )
 
     raw = build_dimensions(nhl, nst)
+
+    # Strip internal scratch fields before output
+    for s in nhl.values():
+        s.pop("_ga_total", None)
+        s.pop("_sa_total", None)
     teams_with_data = list(raw.keys())
 
     # Extract per-dimension raw dicts for normalization
@@ -529,8 +542,11 @@ def main():
                 "defensive":   defensive_n.get(abbr, 0),
             },
             "raw": {
-                "possession_shot_share": round(r["possession"], 4),
-                "rush_sf60":             round(nst.get(abbr, {}).get("rush_sf60") or 0, 2),
+                "corsi_pct":             round(r["possession"], 4),
+                "turnover_diff":         round(nhl.get(abbr, {}).get("turnover_diff", 0), 2),
+                "takeaways_per_gp":      round(nhl.get(abbr, {}).get("takeaways_per_gp", 0), 2),
+                "giveaways_per_gp":      round(nhl.get(abbr, {}).get("giveaways_per_gp", 0), 2),
+                "empty_net_goals":       nhl.get(abbr, {}).get("empty_net_goals", 0),
                 "shooting_pct":          round(r["finishing"], 4),
                 "hits_per_gp":           round(nhl.get(abbr, {}).get("hits_per_gp", 0), 2),
                 "blocks_per_gp":         round(nhl.get(abbr, {}).get("blocks_per_gp", 0), 2),
