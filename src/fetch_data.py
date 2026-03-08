@@ -11,7 +11,9 @@ Sources:
 
 import json
 import os
+import sys
 import time
+import argparse
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone
@@ -123,15 +125,21 @@ def _abbr_from_row(row):
 
 def fetch_standings(season="20252026"):
     """
-    Fetch current standings rank (by points) for each team.
-    Uses the NHL web API standings endpoint.
+    Fetch standings for a given season.
+    For current season uses today's date; for prior seasons uses April 18
+    (after regular season ends, before playoffs distort standings).
     Returns {abbr: {"standings_rank": int, "points": int, "wins": int}}
     """
-    url = f"{NHL_WEB}/standings/{season[:4]}-{season[4:6]}-01"
-    # Try current date standings endpoint
     from datetime import date
-    today = date.today().isoformat()
-    url = f"{NHL_WEB}/standings/{today}"
+    current_season = "20252026"
+    if season == current_season:
+        standings_date = date.today().isoformat()
+    else:
+        # Use April 18 of the season end year — safely after regular season
+        end_year = int(season[4:8])
+        standings_date = f"{end_year}-04-18"
+
+    url = f"{NHL_WEB}/standings/{standings_date}"
     try:
         data = fetch_json(url)
         standings = data.get("standings", [])
@@ -446,14 +454,30 @@ def build_dimensions(nhl: dict, nst: dict) -> dict:
         }
     return dims
 
+# ── Season config ─────────────────────────────────────────────────────────────
+SEASON_CONFIG = {
+    "20252026": {"label": "2025-26", "out": "data/team_identity.json"},
+    "20242025": {"label": "2024-25", "out": "data/team_identity_2425.json"},
+}
+
 # ── Main ─────────────────────────────────────────────────────────────────────
 def main():
-    print("Fetching NHL API team stats...")
-    nhl = fetch_nhl_team_stats()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--season", default="20252026",
+                        help="NHL season ID e.g. 20252026 (default) or 20242025")
+    args = parser.parse_args()
+    season = args.season
+
+    cfg = SEASON_CONFIG.get(season)
+    if not cfg:
+        raise ValueError(f"Unknown season '{season}'. Add it to SEASON_CONFIG.")
+
+    print(f"Fetching NHL API team stats for {cfg['label']}...")
+    nhl = fetch_nhl_team_stats(season)
     time.sleep(0.5)
 
     print("Fetching standings...")
-    standings = fetch_standings()
+    standings = fetch_standings(season)
     time.sleep(0.5)
 
     print("Fetching possession/finishing stats...")
@@ -510,7 +534,8 @@ def main():
     output = {
         "meta": {
             "generated": datetime.now(timezone.utc).isoformat(),
-            "season": "2025-26",
+            "season": cfg["label"],
+            "season_id": season,
             "situation": "All situations (NHL API)",
             "dimensions": ["possession", "transition", "finishing", "physical",
                            "discipline", "goaltending", "defensive"],
@@ -558,7 +583,8 @@ def main():
             "wins":           standings.get(abbr, {}).get("wins", None),
         }
 
-    out_path = "data/team_identity.json"
+    out_path = cfg["out"]
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, "w") as f:
         json.dump(output, f, indent=2)
 
