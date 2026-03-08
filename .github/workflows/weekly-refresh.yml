@@ -16,10 +16,18 @@ on:
 jobs:
   refresh-and-render:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Debug — list workspace
+        run: ls -la
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -37,9 +45,12 @@ jobs:
       - name: Install Node deps
         run: npm install
 
+      - name: Generate seed data (baseline fallback)
+        run: python src/generate_seed.py
+
       - name: Fetch live team stats
         run: python src/fetch_data.py
-        # Falls back gracefully if NHL API is unreachable
+        # Falls back to seed data gracefully if NHL API is unreachable
 
       - name: Generate cards
         run: |
