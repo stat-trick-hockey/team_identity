@@ -118,6 +118,34 @@
   /* ── Season Toggle (single mode only) ── */
 
   /* delta arrows in stat panel */
+  .delta-up   { color: #5ddb8a; font-size: 11px; margin-left: 4px; }
+  .delta-down { color: #ff6b6b; font-size: 11px; margin-left: 4px; }
+  .delta-flat { color: var(--muted); font-size: 11px; margin-left: 4px; }
+
+  /* ── Season Toggle ── */
+  .season-toggle {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 3px;
+    gap: 3px;
+    width: fit-content;
+  }
+  .season-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .season-btn.active      { background: var(--surface2); color: var(--text); }
+  .season-btn.delta-btn.active { background: #1e3020; color: #5ddb8a; }
 
   /* ── Mode Toggle ── */
   .mode-toggle {
@@ -399,7 +427,12 @@
       <button class="mode-btn active" id="btn-single" onclick="setMode('single')">Single Team</button>
       <button class="mode-btn" id="btn-compare" onclick="setMode('compare')">Compare</button>
     </div>
-</div>
+    <div class="season-toggle" id="season-toggle">
+      <button class="season-btn active" id="btn-2526" onclick="setSeason('2526')">2025–26</button>
+      <button class="season-btn" id="btn-2425" onclick="setSeason('2425')">2024–25</button>
+      <button class="season-btn delta-btn" id="btn-delta" onclick="setSeason('delta')">Δ Delta</button>
+    </div>
+  </div>
 
   <div class="controls" id="controls">
     <div class="control-group" id="group-a">
@@ -426,8 +459,27 @@
 </div>
 
 <script>
-// ── Data (loaded from data/team_identity.json) ─────────────────────────────
-let TEAMS_DATA = {};
+// ── Data (loaded from JSON files) ─────────────────────────────────────────────
+let TEAMS_2526 = {};
+let TEAMS_2425 = {};
+let TEAMS_DATA = {};  // active dataset
+
+// ── Season toggle ─────────────────────────────────────────────────────────────
+let currentSeason = '2526';
+
+function setSeason(s) {
+  currentSeason = s;
+  ['2526','2425','delta'].forEach(id => {
+    document.getElementById('btn-' + id).classList.toggle('active', id === s);
+  });
+  if (s === '2526')      TEAMS_DATA = TEAMS_2526;
+  else if (s === '2425') TEAMS_DATA = TEAMS_2425;
+  // delta keeps TEAMS_DATA as 2526, reads 2425 for comparison
+  if (s === 'delta' || s === '2526') TEAMS_DATA = TEAMS_2526;
+  update();
+}
+
+
 
 const DIMS = [
   { key: 'possession',  label: 'Possession',    raw_key: 'corsi_pct',            fmt: v => (v*100).toFixed(1)+'%',  suffix: ' Corsi%' },
@@ -467,7 +519,9 @@ function setMode(m) {
   document.getElementById('btn-compare').classList.toggle('active', m === 'compare');
   document.getElementById('group-b').style.display = m === 'compare' ? '' : 'none';
   document.getElementById('controls').className = 'controls' + (m === 'single' ? ' single' : '');
-  // Season toggle only makes sense in single mode
+  // Delta only available in single mode
+  document.getElementById('btn-delta').style.display = m === 'single' ? '' : 'none';
+  if (m === 'compare' && currentSeason === 'delta') setSeason('2526');
   update();
 }
 
@@ -686,11 +740,11 @@ function renderTitle(teamA, teamB) {
     const divergence = sr != null && pr != null ? sr - pr : null;
     let callout = '';
     if (sr != null && pr != null) {
-      const divColor  = divergence > 3 ? '#ff9f43' : divergence < -3 ? '#5ddb8a' : 'var(--muted)';
+      const divColor  = divergence > 3 ? '#5ddb8a' : divergence < -3 ? '#ff9f43' : 'var(--muted)';
       const divLabel  = divergence > 3
-        ? `Outperforming process by ${divergence} spots`
+        ? `Underperforming process by ${divergence} spots`
         : divergence < -3
-        ? `Underperforming process by ${Math.abs(divergence)} spots`
+        ? `Outperforming process by ${Math.abs(divergence)} spots`
         : `Results tracking process`;
       callout = `<div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap">
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;background:var(--surface2);border:1px solid var(--border);padding:5px 12px">
@@ -719,42 +773,211 @@ function update() {
   const abbA = document.getElementById('select-a').value;
   const abbB = document.getElementById('select-b').value;
 
+  if (currentSeason === 'delta' && mode === 'single') {
+    const teamA = TEAMS_2526[abbA];
+    const teamA_prev = TEAMS_2425[abbA];
+    if (!teamA || !teamA_prev) return;
+    renderTitleDelta(teamA);
+    drawRadarDelta(teamA, teamA_prev);
+    renderStatsDelta(teamA, teamA_prev);
+    return;
+  }
+
   const teamA = TEAMS_DATA[abbA];
   const teamB = mode === 'compare' ? TEAMS_DATA[abbB] : null;
+  if (!teamA) return;
 
   renderTitle(teamA, teamB);
   drawRadar(teamA, teamB);
   renderStats(teamA, teamB);
 }
 
+// ── Delta rendering ───────────────────────────────────────────────────────────
+const COLOR_PREV = '#6a8aaa';
+const COLOR_CURR = '#4a9eff';
+const COLOR_UP   = '#5ddb8a';
+const COLOR_DOWN = '#ff6b6b';
+
+function renderTitleDelta(team) {
+  document.getElementById('radar-title').innerHTML =
+    `${team.name} <span style="font-size:14px;font-weight:400;color:#5a6e87;letter-spacing:.06em">YEAR OVER YEAR</span>`;
+  document.getElementById('radar-legend').innerHTML = `
+    <div class="legend-item"><div class="legend-swatch" style="background:${COLOR_PREV};opacity:0.7"></div>2024–25</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:${COLOR_CURR}"></div>2025–26</div>`;
+}
+
+function drawRadarDelta(teamCurr, teamPrev) {
+  const svg = document.getElementById('radar-svg');
+  svg.innerHTML = '';
+  const W = 480, H = 480, cx = W/2, cy = H/2, R = 165, n = DIMS.length;
+  const ns = 'http://www.w3.org/2000/svg';
+  const g = (tag, attrs) => {
+    const el = document.createElementNS(ns, tag);
+    Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k,v));
+    return el;
+  };
+
+  const defs = g('defs', {});
+  const mkGrad = (id, color, op1, op2) => {
+    const gr = g('radialGradient', {id, cx:'50%', cy:'50%', r:'50%'});
+    gr.appendChild(Object.assign(g('stop', {'offset':'0%','stop-color':color,'stop-opacity':op1}), {}));
+    gr.appendChild(Object.assign(g('stop', {'offset':'100%','stop-color':color,'stop-opacity':op2}), {}));
+    return gr;
+  };
+  defs.appendChild(mkGrad('grad-curr', COLOR_CURR, '0.2', '0.04'));
+  defs.appendChild(mkGrad('grad-prev', COLOR_PREV, '0.15', '0.03'));
+  svg.appendChild(defs);
+
+  // Grid rings
+  [0.25, 0.5, 0.75, 1.0].forEach(t => {
+    const pts = DIMS.map((_,i) => {
+      const a=(2*Math.PI/n)*i;
+      return `${cx+R*t*Math.sin(a)},${cy-R*t*Math.cos(a)}`;
+    }).join(' ');
+    svg.appendChild(g('polygon', {points:pts, fill:'none', stroke:'#1e2d42', 'stroke-width':'1'}));
+  });
+
+  // Axes + labels with delta arrows
+  DIMS.forEach((dim,i) => {
+    const a=(2*Math.PI/n)*i;
+    const [x2,y2]=[cx+R*Math.sin(a), cy-R*Math.cos(a)];
+    svg.appendChild(g('line', {x1:cx,y1:cy,x2,y2,stroke:'#1e2d42','stroke-width':'1'}));
+    const [lx,ly]=[cx+(R+32)*Math.sin(a), cy-(R+32)*Math.cos(a)];
+    const anchor = lx<cx-5?'end':lx>cx+5?'start':'middle';
+
+    const sCurr = teamCurr.scores[dim.key];
+    const sPrev = teamPrev.scores[dim.key];
+    const delta = sCurr - sPrev;
+    const arrowColor = delta > 0.03 ? COLOR_UP : delta < -0.03 ? COLOR_DOWN : '#3a5570';
+    const arrow = delta > 0.03 ? ' ↑' : delta < -0.03 ? ' ↓' : '';
+
+    const lbl = g('text', {x:lx, y:ly+4, 'text-anchor':anchor, fill:'#8aa4c0',
+      'font-family':'Barlow Condensed','font-weight':'700','font-size':'12','letter-spacing':'0.04em'});
+    lbl.textContent = dim.label.toUpperCase();
+    svg.appendChild(lbl);
+
+    if (arrow) {
+      const arr = g('text', {x:lx, y:ly+16, 'text-anchor':anchor, fill:arrowColor,
+        'font-family':'Barlow Condensed','font-weight':'700','font-size':'10'});
+      arr.textContent = (delta>0?'+':'') + (delta*100).toFixed(0) + arrow;
+      svg.appendChild(arr);
+    }
+  });
+
+  // Draw polygon helper
+  function drawPoly(team, color, gradId, strokeW, dashed) {
+    const scores = DIMS.map(d => team.scores[d.key]);
+    const pts = scores.map((s,i) => {
+      const a=(2*Math.PI/n)*i;
+      return `${cx+R*s*Math.sin(a)},${cy-R*s*Math.cos(a)}`;
+    }).join(' ');
+    svg.appendChild(g('polygon', {points:pts, fill:`url(#${gradId})`, stroke:'none'}));
+    const polyAttrs = {points:pts, fill:'none', stroke:color, 'stroke-width':strokeW, 'stroke-linejoin':'round'};
+    if (dashed) polyAttrs['stroke-dasharray'] = '5,3';
+    svg.appendChild(g('polygon', polyAttrs));
+    scores.forEach((s,i) => {
+      const a=(2*Math.PI/n)*i;
+      svg.appendChild(g('circle', {
+        cx:cx+R*s*Math.sin(a), cy:cy-R*s*Math.cos(a),
+        r:'3.5', fill:color, stroke:'#0e1520', 'stroke-width':'1.5'
+      }));
+    });
+  }
+
+  drawPoly(teamPrev, COLOR_PREV, 'grad-prev', '1.5', true);
+  drawPoly(teamCurr, COLOR_CURR, 'grad-curr', '2.5', false);
+  svg.appendChild(g('circle', {cx, cy, r:'3', fill:'#2e4060'}));
+}
+
+function renderStatsDelta(teamCurr, teamPrev) {
+  const panel = document.getElementById('stats-panel');
+  panel.innerHTML = '';
+
+  DIMS.forEach(dim => {
+    const sCurr = teamCurr.scores[dim.key];
+    const sPrev = teamPrev.scores[dim.key];
+    const delta = sCurr - sPrev;
+    const bothZero = sCurr < 0.005 && sPrev < 0.005;
+    const sign = delta > 0.005 ? '+' : '';
+    const arrowClass = delta > 0.005 ? 'delta-up' : delta < -0.005 ? 'delta-down' : 'delta-flat';
+    const arrow = delta > 0.005 ? '▲' : delta < -0.005 ? '▼' : '—';
+
+    const longerIsPrev = sPrev > sCurr;
+    const bgBar = longerIsPrev
+      ? `<div style="position:absolute;height:100%;width:${sPrev*100}%;background:${COLOR_PREV};opacity:0.35"></div>`
+      : `<div style="position:absolute;height:100%;width:${sCurr*100}%;background:${COLOR_CURR}"></div>`;
+    const fgBar = longerIsPrev
+      ? `<div style="position:absolute;height:100%;width:${sCurr*100}%;background:${COLOR_CURR}"></div>`
+      : `<div style="position:absolute;height:100%;width:${sPrev*100}%;background:${COLOR_PREV};opacity:0.35"></div>`;
+
+    const deltaLabel = bothZero
+      ? `<span class="delta-flat">— no data</span>`
+      : `<span class="${arrowClass}">${arrow} ${sign}${(delta*100).toFixed(1)}</span>`;
+
+    const rawCurr = teamCurr.raw[dim.raw_key];
+    const rawPrev = teamPrev.raw[dim.raw_key];
+    const rawCurrFmt = rawCurr != null ? dim.fmt(rawCurr) + dim.suffix : '—';
+    const rawPrevFmt = rawPrev != null ? dim.fmt(rawPrev) + dim.suffix : '—';
+
+    const card = document.createElement('div');
+    card.className = 'stat-card';
+    card.innerHTML = `
+      <div class="stat-header">
+        <div class="stat-name">${dim.label}</div>
+        <div class="stat-rank">${deltaLabel}</div>
+      </div>
+      <div style="position:relative;height:6px;background:var(--surface2);margin-bottom:6px">
+        ${bgBar}${fgBar}
+      </div>
+      <div class="stat-values">
+        <div>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:${COLOR_PREV};font-weight:600">${(sPrev*100).toFixed(0)}</span>
+          <span style="font-size:10px;color:var(--muted)"> → </span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:${COLOR_CURR};font-weight:700">${(sCurr*100).toFixed(0)}<span style="font-size:10px;font-weight:400;color:var(--muted)">/100</span></span>
+        </div>
+        <div style="font-size:11px;color:var(--muted);font-family:'Barlow Condensed',sans-serif">
+          ${rawPrevFmt} → ${rawCurrFmt}
+        </div>
+      </div>`;
+    panel.appendChild(card);
+  });
+}
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-fetch('data/team_identity.json')
-  .then(r => {
-    if (!r.ok) throw new Error('Failed to load team_identity.json: ' + r.status);
-    return r.json();
-  })
-  .then(data => {
-    TEAMS_DATA = data.teams;
+function computeProcessRanks(teamsObj) {
+  const avgRanks = Object.entries(teamsObj).map(([abbr, t]) => ({
+    abbr,
+    avg: Object.values(t.ranks).reduce((a, b) => a + b, 0) / Object.values(t.ranks).length
+  }));
+  avgRanks.sort((a, b) => a.avg - b.avg);
+  avgRanks.forEach((entry, i) => { teamsObj[entry.abbr]._process_rank = i + 1; });
+}
 
-    // Rank each team's process (avg dimension rank) against all 32 teams.
-    // Lower avg rank = better process = lower process rank number.
-    const avgRanks = Object.entries(TEAMS_DATA).map(([abbr, t]) => ({
-      abbr,
-      avg: Object.values(t.ranks).reduce((a, b) => a + b, 0) / Object.values(t.ranks).length
-    }));
-    avgRanks.sort((a, b) => a.avg - b.avg);  // ascending: best process first
-    avgRanks.forEach((entry, i) => {
-      TEAMS_DATA[entry.abbr]._process_rank = i + 1;
-    });
+Promise.all([
+  fetch('data/team_identity.json').then(r => r.ok ? r.json() : Promise.reject('2025-26 load failed')),
+  fetch('data/team_identity_2425.json').then(r => r.ok ? r.json() : null).catch(() => null),
+])
+.then(([data2526, data2425]) => {
+  TEAMS_2526 = data2526.teams;
+  computeProcessRanks(TEAMS_2526);
 
-    populateSelects();
-    update();
-  })
-  .catch(err => {
-    document.getElementById('radar-title').textContent = 'Error loading data';
-    console.error(err);
-  });
+  if (data2425) {
+    TEAMS_2425 = data2425.teams;
+    computeProcessRanks(TEAMS_2425);
+  } else {
+    // 2024-25 not yet available — hide season toggle options
+    document.getElementById('btn-2425').style.display = 'none';
+    document.getElementById('btn-delta').style.display = 'none';
+  }
+
+  TEAMS_DATA = TEAMS_2526;
+  populateSelects();
+  update();
+})
+.catch(err => {
+  document.getElementById('radar-title').textContent = 'Error loading data';
+  console.error(err);
+});
 </script>
 </body>
 </html>
