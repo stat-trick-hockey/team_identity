@@ -1587,12 +1587,21 @@ const ARCHETYPE_LABELS = {
   defensive:   { label: 'Defensive Shell',   color: '#a0b4cc' },
 };
 
-const ARCH_THRESHOLD = 0.65;   // score must be above this to earn the badge
-const ARCH_MAX_BADGES = 2;     // max primary badges shown
+const ARCH_THRESHOLD = 0.65;   // default threshold
+const ARCH_DIM_THRESHOLD = {
+  possession:  0.75,  // 9 teams at 0.65 is too many
+  transition:  0.65,
+  finishing:   0.65,
+  physical:    0.75,  // wide dist, 11 at 0.65
+  discipline:  0.75,  // tight dist — only truly disciplined teams qualify
+  goaltending: 0.75,  // 13 at 0.65 is too many
+  defensive:   0.75,  // 13 at 0.65 is too many
+};
+const ARCH_MAX_BADGES = 2;
 
 function getArchetypes(team) {
   const scored = DIMS.map(d => ({ key: d.key, score: team.scores[d.key] }))
-    .filter(d => d.score >= ARCH_THRESHOLD)
+    .filter(d => d.score >= (ARCH_DIM_THRESHOLD[d.key] ?? ARCH_THRESHOLD))
     .sort((a, b) => b.score - a.score);
   if (!scored.length) return [{ key: 'balanced', label: 'Balanced', color: '#3a5570' }];
   return scored.slice(0, ARCH_MAX_BADGES).map(d => ({
