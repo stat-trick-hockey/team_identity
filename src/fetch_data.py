@@ -429,8 +429,9 @@ def build_dimensions(nhl: dict, nst: dict) -> dict:
         dims[abbr] = {
             # 1. Possession — Corsi% (shot attempt share all-sit) from /realtime
             "possession":     corsi,
-            # 2. Transition — net turnover differential per GP (takeaways - giveaways)
-            "transition":     n.get("turnover_diff", 0),
+            # 2. Transition — takeaways per GP from /realtime.
+            #    Direct measure of puck-winning; always positive, no asymmetry issues.
+            "transition":     n.get("takeaways_per_gp", 0),
             # 3. Finishing — shooting %
             "finishing":      shooting_pct,
             # 4. Physical — hits + blocked shots per GP
