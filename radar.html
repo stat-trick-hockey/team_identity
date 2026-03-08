@@ -658,7 +658,7 @@
 
   .arch-name {
     font-size: 12px;
-    color: var(--muted);
+    color: #8aa4c0;
   }
 
   .arch-badge {
@@ -675,7 +675,8 @@
   .arch-score-bar {
     display: flex;
     gap: 2px;
-    align-items: center;
+    align-items: flex-end;
+    height: 14px;
   }
 
   .arch-pip {
@@ -1530,16 +1531,25 @@ function renderMovers() {
     const makeRow = (e, up) => {
       const barW = Math.abs(e.delta) / (maxAbs || 1) * 100;
       const color = up ? '#3ddc84' : '#ff6b6b';
-      // raw prev→curr display using dim.fmt for the primary key
-      const rawPrevFmt = dim.fmt(e.rawPrev) + dim.suffix;
-      const rawCurrFmt = dim.fmt(e.rawCurr) + dim.suffix;
+      let rawStr;
+      if (dim.key === 'discipline') {
+        const prev = TEAMS_2425[e.abbr]?.raw;
+        const curr = TEAMS_2526[e.abbr]?.raw;
+        const pimP = prev?.pim_per_gp?.toFixed(2) ?? '—';
+        const pimC = curr?.pim_per_gp?.toFixed(2) ?? '—';
+        const gaP  = prev?.giveaways_per_gp?.toFixed(2) ?? '—';
+        const gaC  = curr?.giveaways_per_gp?.toFixed(2) ?? '—';
+        rawStr = `PIM ${pimP}→${pimC} · GA ${gaP}→${gaC}`;
+      } else {
+        rawStr = `${dim.fmt(e.rawPrev)}${dim.suffix} → ${dim.fmt(e.rawCurr)}${dim.suffix}`;
+      }
       return `<div class="movers-row">
         <span class="movers-abbr" style="color:${e.primary}">${e.abbr}</span>
         <div class="movers-bar-track">
           <div class="movers-bar-fill" style="width:${barW}%;background:${color};left:0"></div>
         </div>
         <span class="movers-delta" style="color:${color}">${e.delta > 0 ? '+' : ''}${(e.delta*100).toFixed(1)}</span>
-        <span class="movers-raw">${rawPrevFmt} → ${rawCurrFmt}</span>
+        <span class="movers-raw" style="${dim.key==='discipline'?'width:160px':''}">${rawStr}</span>
       </div>`;
     };
 
@@ -1602,7 +1612,7 @@ function renderArchetypes(season) {
       const s = team.scores[d.key];
       const alpha = 0.2 + s * 0.8;
       const col = ARCHETYPE_LABELS[d.key]?.color || '#4a9eff';
-      return `<div class="arch-pip" style="background:${col};opacity:${alpha.toFixed(2)}" title="${d.label}: ${(s*100).toFixed(0)}"></div>`;
+      return `<div class="arch-pip" style="height:${Math.max(2, Math.round(s*14))}px;background:${col};align-self:flex-end" title="${d.label}: ${(s*100).toFixed(0)}"></div>`;
     }).join('');
 
     const rankStr = team.standings_rank ? `#${team.standings_rank}` : '—';
