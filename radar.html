@@ -1050,7 +1050,13 @@ const COLOR_DOWN = '#ff6b6b';
 function renderTitleDelta(team) {
   document.getElementById('radar-title').innerHTML =
     `${team.name} <span style="font-size:14px;font-weight:400;color:#5a6e87;letter-spacing:.06em">YEAR OVER YEAR</span>`;
-  document.getElementById('radar-legend').innerHTML = `<div style="display:flex;gap:16px;flex-wrap:wrap">
+
+  const staleWarning = window.DELTA_STALE ? `
+    <div style="margin-bottom:10px;padding:8px 12px;background:#1a1200;border:1px solid #7a5c00;font-family:'Barlow Condensed',sans-serif;font-size:12px;color:#c9a227;letter-spacing:.04em">
+      ⚠ 2024–25 data was generated with an older pipeline — Possession and Transition metrics are not comparable. Re-run CI with <code style="background:#0e0c00;padding:1px 5px">--season 20242025</code> to fix.
+    </div>` : '';
+
+  document.getElementById('radar-legend').innerHTML = staleWarning + `<div style="display:flex;gap:16px;flex-wrap:wrap">
     <div class="legend-item"><div class="legend-swatch" style="background:${COLOR_PREV};opacity:0.7"></div>2024–25</div>
     <div class="legend-item"><div class="legend-swatch" style="background:${COLOR_CURR}"></div>2025–26</div>
   </div>`;
@@ -1170,9 +1176,9 @@ function renderStatsDelta(teamCurr, teamPrev) {
     const rawPrev = teamPrev.raw[dim.raw_key];
     const discBreakdown = dim.key === 'discipline' ? (() => {
       const pimP  = teamPrev.raw.pim_per_gp  != null ? teamPrev.raw.pim_per_gp.toFixed(2)  : '—';
-      const gaP   = teamPrev.raw.giveaways_per_gp != null ? teamPrev.raw.giveaways_per_gp.toFixed(2) : '—';
+      const gaP   = teamPrev.raw.giveaways_per_gp != null ? teamPrev.raw.giveaways_per_gp.toFixed(2) : 'n/a';
       const pimC  = teamCurr.raw.pim_per_gp  != null ? teamCurr.raw.pim_per_gp.toFixed(2)  : '—';
-      const gaC   = teamCurr.raw.giveaways_per_gp != null ? teamCurr.raw.giveaways_per_gp.toFixed(2) : '—';
+      const gaC   = teamCurr.raw.giveaways_per_gp != null ? teamCurr.raw.giveaways_per_gp.toFixed(2) : 'n/a';
       return `<div style="display:flex;justify-content:space-between;margin:3px 0 4px">
         <span style="font-size:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif">
           <span style="color:#a0b4cc;font-weight:600">PIM</span> ${pimP}/gp
@@ -1238,6 +1244,9 @@ Promise.all([
   if (data2425 && data2425.teams && Object.keys(data2425.teams).length > 0) {
     TEAMS_2425 = data2425.teams;
     computeProcessRanks(TEAMS_2425);
+    // Flag if this is seed/legacy data — methodology differs from current pipeline
+    const meta2425 = data2425.meta || {};
+    window.DELTA_STALE = !meta2425.season_id || String(meta2425.generated).includes('seed');
   } else {
     document.getElementById('btn-2425').style.display = 'none';
     document.getElementById('btn-delta').style.display = 'none';
