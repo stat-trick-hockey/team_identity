@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-03-08T02:31:29.296381+00:00",
+    "generated": "2026-03-08T02:42:20.449819+00:00",
     "season": "2025-26",
     "season_id": "20252026",
     "situation": "All situations (NHL API)",
@@ -1217,7 +1217,7 @@
       },
       "gp": 62,
       "standings_rank": 32,
-      "points": 45,
+      "points": 46,
       "wins": 19
     },
     "VGK": {
@@ -1346,8 +1346,8 @@
       },
       "gp": 61,
       "standings_rank": 27,
-      "points": 60,
-      "wins": 25
+      "points": 62,
+      "wins": 26
     }
   }
 }
