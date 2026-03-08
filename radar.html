@@ -1165,23 +1165,30 @@ function renderStatsDelta(teamCurr, teamPrev) {
       ? `<span class="delta-flat">— no data</span>`
       : `<span class="${arrowClass}">${arrow} ${sign}${(delta*100).toFixed(1)}</span>`;
 
-    const rawCurr = teamCurr.raw[dim.raw_key];
-    const rawPrev = teamPrev.raw[dim.raw_key];
+    // Discipline: show PIM and giveaways for both seasons
+    const discBreakdown = dim.key === 'discipline' ? (() => {
+      const pimP  = teamPrev.raw.pim_per_gp  != null ? teamPrev.raw.pim_per_gp.toFixed(2)  : '—';
+      const gaP   = teamPrev.raw.giveaways_per_gp != null ? teamPrev.raw.giveaways_per_gp.toFixed(2) : '—';
+      const pimC  = teamCurr.raw.pim_per_gp  != null ? teamCurr.raw.pim_per_gp.toFixed(2)  : '—';
+      const gaC   = teamCurr.raw.giveaways_per_gp != null ? teamCurr.raw.giveaways_per_gp.toFixed(2) : '—';
+      return `<div style="display:flex;justify-content:space-between;margin:3px 0 4px">
+        <span style="font-size:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif">
+          <span style="color:#a0b4cc;font-weight:600">PIM</span> ${pimP}/gp
+          &nbsp;·&nbsp;<span style="color:#a0b4cc;font-weight:600">GA</span> ${gaP}/gp
+        </span>
+        <span style="font-size:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif">
+          <span style="color:#a0b4cc;font-weight:600">PIM</span> ${pimC}/gp
+          &nbsp;·&nbsp;<span style="color:#a0b4cc;font-weight:600">GA</span> ${gaC}/gp
+        </span>
+      </div>`;
+    })() : '';
+
     const rawCurrFmt = rawCurr != null ? dim.fmt(rawCurr) + dim.suffix : '—';
     const rawPrevFmt = rawPrev != null ? dim.fmt(rawPrev) + dim.suffix : '—';
-
-    // Discipline: show PIM and giveaways for both seasons
-    const discBreakdown = dim.key === 'discipline' ? `
-      <div style="display:flex;justify-content:space-between;margin:3px 0 2px">
-        <span style="font-size:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif">
-          <span style="color:#a0b4cc;font-weight:600">PIM</span> ${(teamPrev.raw.pim_per_gp??0).toFixed(2)}
-          · <span style="color:#a0b4cc;font-weight:600">GA</span> ${(teamPrev.raw.giveaways_per_gp??0).toFixed(2)}
-        </span>
-        <span style="font-size:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;text-align:right">
-          <span style="color:#a0b4cc;font-weight:600">PIM</span> ${(teamCurr.raw.pim_per_gp??0).toFixed(2)}
-          · <span style="color:#a0b4cc;font-weight:600">GA</span> ${(teamCurr.raw.giveaways_per_gp??0).toFixed(2)}
-        </span>
-      </div>` : '';
+    // For discipline the bottom raw line already covered by discBreakdown; show score change only
+    const rawLine = dim.key === 'discipline'
+      ? `<span style="color:var(--muted);font-size:10px;letter-spacing:.04em">PIM 70% · Giveaways 30% · inverted</span>`
+      : `${rawPrevFmt} → ${rawCurrFmt}`;
 
     const card = document.createElement('div');
     card.className = 'stat-card';
@@ -1201,7 +1208,7 @@ function renderStatsDelta(teamCurr, teamPrev) {
           <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:${COLOR_CURR};font-weight:700">${(sCurr*100).toFixed(0)}<span style="font-size:10px;font-weight:400;color:var(--muted)">/100</span></span>
         </div>
         <div style="font-size:11px;color:var(--muted);font-family:'Barlow Condensed',sans-serif">
-          ${rawPrevFmt} → ${rawCurrFmt}
+          ${rawLine}
         </div>
       </div>`;
     panel.appendChild(card);
