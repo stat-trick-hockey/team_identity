@@ -461,16 +461,10 @@ def main():
     print(f"  Got data for {len(nhl)} teams (NHL API), {len(nst)} teams (NST proxy)")
 
     if len(nhl) < 20:
-        print(f"  NHL API returned only {len(nhl)} teams (expected ~32) — falling back to seed file.")
-        seed_path = "data/team_identity.json"
-        if os.path.exists(seed_path):
-            print(f"  Seed file found, keeping existing data.")
-            return
-        else:
-            raise RuntimeError(
-                f"NHL API returned {len(nhl)} teams and no seed file exists. "
-                "Run src/generate_seed.py first to create data/team_identity.json."
-            )
+        raise RuntimeError(
+            f"NHL API returned only {len(nhl)} teams (expected ~32). "
+            "Not writing output — check API availability."
+        )
 
     raw = build_dimensions(nhl, nst)
 
