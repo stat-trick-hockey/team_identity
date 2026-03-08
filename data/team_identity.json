@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-03-08T00:48:40.533550+00:00",
+    "generated": "2026-03-08T01:02:38.334449+00:00",
     "season": "2025-26",
     "situation": "All situations (NHL API)",
     "dimensions": [
@@ -22,7 +22,7 @@
       "secondary": "#B9975B",
       "scores": {
         "possession": 0.4432,
-        "transition": 0.4413,
+        "transition": 0.4972,
         "finishing": 0.4779,
         "physical": 0.5626,
         "discipline": 0.646,
@@ -46,7 +46,7 @@
       },
       "ranks": {
         "possession": 7,
-        "transition": 13,
+        "transition": 5,
         "finishing": 17,
         "physical": 10,
         "discipline": 24,
@@ -65,7 +65,7 @@
       "secondary": "#000000",
       "scores": {
         "possession": 0.2735,
-        "transition": 0.2028,
+        "transition": 0.3631,
         "finishing": 0.7674,
         "physical": 0.8026,
         "discipline": 0.1183,
@@ -89,7 +89,7 @@
       },
       "ranks": {
         "possession": 17,
-        "transition": 25,
+        "transition": 9,
         "finishing": 3,
         "physical": 2,
         "discipline": 30,
@@ -108,7 +108,7 @@
       "secondary": "#FFB81C",
       "scores": {
         "possession": 0.2252,
-        "transition": 0.3594,
+        "transition": 0.6425,
         "finishing": 0.7529,
         "physical": 0.3471,
         "discipline": 0.6796,
@@ -132,7 +132,7 @@
       },
       "ranks": {
         "possession": 20,
-        "transition": 18,
+        "transition": 3,
         "finishing": 4,
         "physical": 19,
         "discipline": 21,
@@ -151,7 +151,7 @@
       "secondary": "#F1BE48",
       "scores": {
         "possession": 0.363,
-        "transition": 0.0712,
+        "transition": 0.1844,
         "finishing": 0.0,
         "physical": 0.5423,
         "discipline": 0.2943,
@@ -175,7 +175,7 @@
       },
       "ranks": {
         "possession": 12,
-        "transition": 30,
+        "transition": 23,
         "finishing": 31,
         "physical": 11,
         "discipline": 29,
@@ -194,7 +194,7 @@
       "secondary": "#000000",
       "scores": {
         "possession": 1.0,
-        "transition": 0.6192,
+        "transition": 1.0,
         "finishing": 0.488,
         "physical": 0.1218,
         "discipline": 0.8458,
@@ -218,7 +218,7 @@
       },
       "ranks": {
         "possession": 1,
-        "transition": 6,
+        "transition": 1,
         "finishing": 16,
         "physical": 29,
         "discipline": 12,
@@ -237,7 +237,7 @@
       "secondary": "#000000",
       "scores": {
         "possession": 0.1002,
-        "transition": 0.3701,
+        "transition": 0.4972,
         "finishing": 0.4621,
         "physical": 0.0,
         "discipline": 0.6451,
@@ -261,7 +261,7 @@
       },
       "ranks": {
         "possession": 28,
-        "transition": 16,
+        "transition": 6,
         "finishing": 18,
         "physical": 31,
         "discipline": 26,
@@ -280,7 +280,7 @@
       "secondary": "#236192",
       "scores": {
         "possession": 0.789,
-        "transition": 0.1246,
+        "transition": 0.2682,
         "finishing": 0.5576,
         "physical": 0.0465,
         "discipline": 0.9427,
@@ -304,7 +304,7 @@
       },
       "ranks": {
         "possession": 2,
-        "transition": 27,
+        "transition": 15,
         "finishing": 13,
         "physical": 30,
         "discipline": 5,
@@ -323,7 +323,7 @@
       "secondary": "#CE1126",
       "scores": {
         "possession": 0.3754,
-        "transition": 0.4093,
+        "transition": 0.4525,
         "finishing": 0.4125,
         "physical": 0.3824,
         "discipline": 0.8881,
@@ -347,7 +347,7 @@
       },
       "ranks": {
         "possession": 11,
-        "transition": 15,
+        "transition": 8,
         "finishing": 22,
         "physical": 17,
         "discipline": 10,
@@ -366,7 +366,7 @@
       "secondary": "#8F8F8C",
       "scores": {
         "possession": 0.112,
-        "transition": 0.6014,
+        "transition": 0.3184,
         "finishing": 0.9552,
         "physical": 0.3118,
         "discipline": 0.8438,
@@ -390,7 +390,7 @@
       },
       "ranks": {
         "possession": 27,
-        "transition": 7,
+        "transition": 12,
         "finishing": 2,
         "physical": 22,
         "discipline": 14,
@@ -409,7 +409,7 @@
       "secondary": "#FFFFFF",
       "scores": {
         "possession": 0.2824,
-        "transition": 0.3381,
+        "transition": 0.0894,
         "finishing": 0.3833,
         "physical": 0.2815,
         "discipline": 0.9144,
@@ -433,7 +433,7 @@
       },
       "ranks": {
         "possession": 16,
-        "transition": 20,
+        "transition": 27,
         "finishing": 25,
         "physical": 23,
         "discipline": 9,
@@ -452,7 +452,7 @@
       "secondary": "#041E42",
       "scores": {
         "possession": 0.3559,
-        "transition": 0.1139,
+        "transition": 0.0782,
         "finishing": 0.6861,
         "physical": 0.1571,
         "discipline": 0.6455,
@@ -495,7 +495,7 @@
       "secondary": "#C8102E",
       "scores": {
         "possession": 0.5035,
-        "transition": 0.7224,
+        "transition": 0.095,
         "finishing": 0.364,
         "physical": 0.7132,
         "discipline": 0.3986,
@@ -519,7 +519,7 @@
       },
       "ranks": {
         "possession": 5,
-        "transition": 4,
+        "transition": 26,
         "finishing": 27,
         "physical": 3,
         "discipline": 28,
@@ -538,7 +538,7 @@
       "secondary": "#A2AAAD",
       "scores": {
         "possession": 0.4912,
-        "transition": 0.1423,
+        "transition": 0.3128,
         "finishing": 0.1738,
         "physical": 0.2762,
         "discipline": 0.7458,
@@ -562,7 +562,7 @@
       },
       "ranks": {
         "possession": 6,
-        "transition": 26,
+        "transition": 13,
         "finishing": 29,
         "physical": 24,
         "discipline": 19,
@@ -581,7 +581,7 @@
       "secondary": "#A6192E",
       "scores": {
         "possession": 0.1419,
-        "transition": 0.5979,
+        "transition": 0.257,
         "finishing": 0.6346,
         "physical": 0.5255,
         "discipline": 1.0,
@@ -605,7 +605,7 @@
       },
       "ranks": {
         "possession": 24,
-        "transition": 9,
+        "transition": 16,
         "finishing": 8,
         "physical": 13,
         "discipline": 1,
@@ -624,7 +624,7 @@
       "secondary": "#192168",
       "scores": {
         "possession": 0.2165,
-        "transition": 1.0,
+        "transition": 0.2235,
         "finishing": 1.0,
         "physical": 0.6779,
         "discipline": 0.6702,
@@ -648,7 +648,7 @@
       },
       "ranks": {
         "possession": 21,
-        "transition": 1,
+        "transition": 20,
         "finishing": 1,
         "physical": 8,
         "discipline": 22,
@@ -667,7 +667,7 @@
       "secondary": "#041E42",
       "scores": {
         "possession": 0.4056,
-        "transition": 0.7224,
+        "transition": 0.648,
         "finishing": 0.3758,
         "physical": 0.2021,
         "discipline": 0.7917,
@@ -691,7 +691,7 @@
       },
       "ranks": {
         "possession": 10,
-        "transition": 5,
+        "transition": 2,
         "finishing": 26,
         "physical": 27,
         "discipline": 17,
@@ -710,7 +710,7 @@
       "secondary": "#000000",
       "scores": {
         "possession": 0.4245,
-        "transition": 0.3132,
+        "transition": 0.3631,
         "finishing": 0.0415,
         "physical": 0.3268,
         "discipline": 0.9483,
@@ -734,7 +734,7 @@
       },
       "ranks": {
         "possession": 8,
-        "transition": 21,
+        "transition": 10,
         "finishing": 30,
         "physical": 21,
         "discipline": 4,
@@ -753,7 +753,7 @@
       "secondary": "#FC4C02",
       "scores": {
         "possession": 0.1977,
-        "transition": 0.5979,
+        "transition": 0.2291,
         "finishing": 0.3971,
         "physical": 0.328,
         "discipline": 0.916,
@@ -777,7 +777,7 @@
       },
       "ranks": {
         "possession": 22,
-        "transition": 10,
+        "transition": 18,
         "finishing": 23,
         "physical": 20,
         "discipline": 8,
@@ -796,7 +796,7 @@
       "secondary": "#CE1126",
       "scores": {
         "possession": 0.2322,
-        "transition": 0.6014,
+        "transition": 0.2011,
         "finishing": 0.4198,
         "physical": 1.0,
         "discipline": 0.9519,
@@ -820,7 +820,7 @@
       },
       "ranks": {
         "possession": 19,
-        "transition": 8,
+        "transition": 21,
         "finishing": 21,
         "physical": 1,
         "discipline": 3,
@@ -839,7 +839,7 @@
       "secondary": "#C69214",
       "scores": {
         "possession": 0.5228,
-        "transition": 1.0,
+        "transition": 0.5307,
         "finishing": 0.6248,
         "physical": 0.7063,
         "discipline": 0.659,
@@ -863,7 +863,7 @@
       },
       "ranks": {
         "possession": 4,
-        "transition": 2,
+        "transition": 4,
         "finishing": 9,
         "physical": 4,
         "discipline": 23,
@@ -882,7 +882,7 @@
       "secondary": "#000000",
       "scores": {
         "possession": 0.1402,
-        "transition": 0.363,
+        "transition": 0.0391,
         "finishing": 0.534,
         "physical": 0.6857,
         "discipline": 0.6161,
@@ -906,7 +906,7 @@
       },
       "ranks": {
         "possession": 25,
-        "transition": 17,
+        "transition": 29,
         "finishing": 15,
         "physical": 7,
         "discipline": 27,
@@ -925,7 +925,7 @@
       "secondary": "#000000",
       "scores": {
         "possession": 0.3603,
-        "transition": 0.2171,
+        "transition": 0.4693,
         "finishing": 0.6045,
         "physical": 0.2127,
         "discipline": 0.7963,
@@ -949,7 +949,7 @@
       },
       "ranks": {
         "possession": 13,
-        "transition": 23,
+        "transition": 7,
         "finishing": 11,
         "physical": 26,
         "discipline": 16,
@@ -968,7 +968,7 @@
       "secondary": "#99D9D9",
       "scores": {
         "possession": 0.0,
-        "transition": 0.4982,
+        "transition": 0.3128,
         "finishing": 0.5513,
         "physical": 0.3768,
         "discipline": 0.9168,
@@ -992,7 +992,7 @@
       },
       "ranks": {
         "possession": 31,
-        "transition": 11,
+        "transition": 14,
         "finishing": 14,
         "physical": 18,
         "discipline": 7,
@@ -1011,7 +1011,7 @@
       "secondary": "#EA7200",
       "scores": {
         "possession": 0.0073,
-        "transition": 0.21,
+        "transition": 0.2458,
         "finishing": 0.7071,
         "physical": 0.5417,
         "discipline": 0.7735,
@@ -1035,7 +1035,7 @@
       },
       "ranks": {
         "possession": 30,
-        "transition": 24,
+        "transition": 17,
         "finishing": 6,
         "physical": 12,
         "discipline": 18,
@@ -1054,7 +1054,7 @@
       "secondary": "#FCB514",
       "scores": {
         "possession": 0.1612,
-        "transition": 0.8114,
+        "transition": 0.1508,
         "finishing": 0.3906,
         "physical": 0.692,
         "discipline": 0.9773,
@@ -1078,7 +1078,7 @@
       },
       "ranks": {
         "possession": 23,
-        "transition": 3,
+        "transition": 25,
         "finishing": 24,
         "physical": 6,
         "discipline": 2,
@@ -1097,7 +1097,7 @@
       "secondary": "#FFFFFF",
       "scores": {
         "possession": 0.5572,
-        "transition": 0.4306,
+        "transition": 0.0279,
         "finishing": 0.7488,
         "physical": 0.2499,
         "discipline": 0.0,
@@ -1121,7 +1121,7 @@
       },
       "ranks": {
         "possession": 3,
-        "transition": 14,
+        "transition": 30,
         "finishing": 5,
         "physical": 25,
         "discipline": 31,
@@ -1140,7 +1140,7 @@
       "secondary": "#FFFFFF",
       "scores": {
         "possession": 0.0562,
-        "transition": 0.1032,
+        "transition": 0.3631,
         "finishing": 0.6115,
         "physical": 0.6973,
         "discipline": 0.8755,
@@ -1164,7 +1164,7 @@
       },
       "ranks": {
         "possession": 29,
-        "transition": 29,
+        "transition": 11,
         "finishing": 10,
         "physical": 5,
         "discipline": 11,
@@ -1183,7 +1183,7 @@
       "secondary": "#00843D",
       "scores": {
         "possession": 0.1337,
-        "transition": 0.2349,
+        "transition": 0.2011,
         "finishing": 0.2523,
         "physical": 0.4705,
         "discipline": 0.8085,
@@ -1226,7 +1226,7 @@
       "secondary": "#333F48",
       "scores": {
         "possession": 0.4194,
-        "transition": 0.0,
+        "transition": 0.2291,
         "finishing": 0.6025,
         "physical": 0.5127,
         "discipline": 0.9356,
@@ -1250,7 +1250,7 @@
       },
       "ranks": {
         "possession": 9,
-        "transition": 31,
+        "transition": 19,
         "finishing": 12,
         "physical": 14,
         "discipline": 6,
@@ -1269,7 +1269,7 @@
       "secondary": "#C8102E",
       "scores": {
         "possession": 0.3546,
-        "transition": 0.3594,
+        "transition": 0.1564,
         "finishing": 0.4604,
         "physical": 0.4814,
         "discipline": 0.6927,
@@ -1293,7 +1293,7 @@
       },
       "ranks": {
         "possession": 15,
-        "transition": 19,
+        "transition": 24,
         "finishing": 20,
         "physical": 15,
         "discipline": 20,
@@ -1312,7 +1312,7 @@
       "secondary": "#004C97",
       "scores": {
         "possession": 0.2456,
-        "transition": 0.4804,
+        "transition": 0.0,
         "finishing": 0.4615,
         "physical": 0.5995,
         "discipline": 0.8444,
@@ -1336,7 +1336,7 @@
       },
       "ranks": {
         "possession": 18,
-        "transition": 12,
+        "transition": 31,
         "finishing": 19,
         "physical": 9,
         "discipline": 13,
