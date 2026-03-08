@@ -681,17 +681,49 @@ function setSeason(s) {
 
 
 const DIMS = [
-  { key: 'possession',  label: 'Possession',    raw_key: 'corsi_pct',            fmt: v => (v*100).toFixed(1)+'%',  suffix: ' Corsi%' },
-  { key: 'transition',  label: 'Transition',    raw_key: 'takeaways_per_gp',     fmt: v => v.toFixed(2),            suffix: ' TK/GP' },
-  { key: 'finishing',   label: 'Finishing',     raw_key: 'shooting_pct',          fmt: v => (v*100).toFixed(1)+'%',  suffix: ' sh%' },
-  { key: 'physical',    label: 'Physical',      raw_key: 'hits_per_gp',           fmt: v => v.toFixed(1),            suffix: ' hits/gp' },
-  { key: 'discipline',  label: 'Discipline',    raw_key: 'pim_per_gp',            fmt: v => v.toFixed(2),            suffix: ' PIM/gp' },
-  { key: 'goaltending', label: 'Goaltending',   raw_key: 'save_pct',              fmt: v => v.toFixed(3),            suffix: ' SV%' },
-  { key: 'defensive',   label: 'Defensive',     raw_key: 'shots_against_per_gp',  fmt: v => v.toFixed(1),            suffix: ' SA/gp' },
+  { key: 'possession',  label: 'Possession',    raw_key: 'corsi_pct',             fmt: v => (v*100).toFixed(1)+'%',  suffix: ' Corsi%',   higher_better: true,  raw_key2: null,                  w1: 1.0, w2: 0.0 },
+  { key: 'transition',  label: 'Transition',    raw_key: 'takeaways_per_gp',      fmt: v => v.toFixed(2),            suffix: ' TK/GP',    higher_better: true,  raw_key2: null,                  w1: 1.0, w2: 0.0 },
+  { key: 'finishing',   label: 'Finishing',     raw_key: 'shooting_pct',           fmt: v => (v*100).toFixed(1)+'%',  suffix: ' sh%',      higher_better: true,  raw_key2: null,                  w1: 1.0, w2: 0.0 },
+  { key: 'physical',    label: 'Physical',      raw_key: 'hits_per_gp',            fmt: v => v.toFixed(1),            suffix: ' hits/gp',  higher_better: true,  raw_key2: 'blocks_per_gp',       w1: 0.6, w2: 0.4 },
+  { key: 'discipline',  label: 'Discipline',    raw_key: 'pim_per_gp',             fmt: v => v.toFixed(2),            suffix: ' PIM/gp',   higher_better: false, raw_key2: 'giveaways_per_gp',    w1: 0.7, w2: 0.3 },
+  { key: 'goaltending', label: 'Goaltending',   raw_key: 'save_pct',               fmt: v => v.toFixed(3),            suffix: ' SV%',      higher_better: true,  raw_key2: null,                  w1: 1.0, w2: 0.0 },
+  { key: 'defensive',   label: 'Defensive',     raw_key: 'shots_against_per_gp',   fmt: v => v.toFixed(1),            suffix: ' SA/gp',    higher_better: false, raw_key2: null,                  w1: 1.0, w2: 0.0 },
 ];
 
 const COLOR_A = '#4a9eff';
 const COLOR_B = '#ff6b6b';
+
+// ── Delta normalization helpers ───────────────────────────────────────────────
+// Compute per-dim league min/max from current season raw values (blended where needed)
+function computeLeagueRanges(teamsObj) {
+  const ranges = {};
+  DIMS.forEach(dim => {
+    const vals = Object.values(teamsObj).map(t => {
+      const v1 = t.raw[dim.raw_key] ?? 0;
+      const v2 = dim.raw_key2 ? (t.raw[dim.raw_key2] ?? 0) : 0;
+      return v1 * dim.w1 + v2 * dim.w2;
+    });
+    ranges[dim.key] = { lo: Math.min(...vals), hi: Math.max(...vals) };
+  });
+  return ranges;
+}
+
+// Normalize a raw blend value onto current-season scale, respecting inversion
+function normOnCurrentScale(rawVal, dim, ranges) {
+  const { lo, hi } = ranges[dim.key];
+  const rng = hi - lo || 1;
+  const n = Math.max(0, Math.min(1, (rawVal - lo) / rng));
+  return dim.higher_better ? n : 1 - n;
+}
+
+// Get blended raw value for a team/dim
+function getRawBlend(teamRaw, dim) {
+  const v1 = teamRaw[dim.raw_key] ?? 0;
+  const v2 = dim.raw_key2 ? (teamRaw[dim.raw_key2] ?? 0) : 0;
+  return v1 * dim.w1 + v2 * dim.w2;
+}
+
+let LEAGUE_RANGES_2526 = {};
 
 let mode = 'single';
 
@@ -1084,6 +1116,13 @@ function drawRadarDelta(teamCurr, teamPrev) {
   defs.appendChild(mkGrad('grad-prev', COLOR_PREV, '0.15', '0.03'));
   svg.appendChild(defs);
 
+  // Scores: curr uses its own normalized scores; prev is mapped onto current-season scale
+  const scoresCurr = DIMS.map(d => teamCurr.scores[d.key]);
+  const scoresPrev = DIMS.map(d => {
+    const raw = getRawBlend(teamPrev.raw, d);
+    return normOnCurrentScale(raw, d, LEAGUE_RANGES_2526);
+  });
+
   // Grid rings
   [0.25, 0.5, 0.75, 1.0].forEach(t => {
     const pts = DIMS.map((_,i) => {
@@ -1093,7 +1132,7 @@ function drawRadarDelta(teamCurr, teamPrev) {
     svg.appendChild(g('polygon', {points:pts, fill:'none', stroke:'#1e2d42', 'stroke-width':'1'}));
   });
 
-  // Axes + labels with delta arrows
+  // Axes + labels with delta arrows driven by common-scale delta
   DIMS.forEach((dim,i) => {
     const a=(2*Math.PI/n)*i;
     const [x2,y2]=[cx+R*Math.sin(a), cy-R*Math.cos(a)];
@@ -1102,9 +1141,7 @@ function drawRadarDelta(teamCurr, teamPrev) {
     const [lx,ly]=[cx+labelR*Math.sin(a), cy-labelR*Math.cos(a)];
     const anchor = lx<cx-5?'end':lx>cx+5?'start':'middle';
 
-    const sCurr = teamCurr.scores[dim.key];
-    const sPrev = teamPrev.scores[dim.key];
-    const delta = sCurr - sPrev;
+    const delta = scoresCurr[i] - scoresPrev[i];
     const arrowColor = delta > 0.03 ? COLOR_UP : delta < -0.03 ? COLOR_DOWN : '#3a5570';
     const arrow = delta > 0.03 ? ' ↑' : delta < -0.03 ? ' ↓' : '';
 
@@ -1122,8 +1159,7 @@ function drawRadarDelta(teamCurr, teamPrev) {
   });
 
   // Draw polygon helper
-  function drawPoly(team, color, gradId, strokeW, dashed) {
-    const scores = DIMS.map(d => team.scores[d.key]);
+  function drawPoly(scores, color, gradId, strokeW, dashed) {
     const pts = scores.map((s,i) => {
       const a=(2*Math.PI/n)*i;
       return `${cx+R*s*Math.sin(a)},${cy-R*s*Math.cos(a)}`;
@@ -1141,8 +1177,8 @@ function drawRadarDelta(teamCurr, teamPrev) {
     });
   }
 
-  drawPoly(teamPrev, COLOR_PREV, 'grad-prev', '1.5', true);
-  drawPoly(teamCurr, COLOR_CURR, 'grad-curr', '2.5', false);
+  drawPoly(scoresPrev, COLOR_PREV, 'grad-prev', '1.5', true);
+  drawPoly(scoresCurr, COLOR_CURR, 'grad-curr', '2.5', false);
   svg.appendChild(g('circle', {cx, cy, r:'3', fill:'#2e4060'}));
 }
 
@@ -1151,14 +1187,18 @@ function renderStatsDelta(teamCurr, teamPrev) {
   panel.innerHTML = '';
 
   DIMS.forEach(dim => {
+    // Compute common-scale scores for bar + arrow direction
     const sCurr = teamCurr.scores[dim.key];
-    const sPrev = teamPrev.scores[dim.key];
+    const sPrev = normOnCurrentScale(getRawBlend(teamPrev.raw, dim), dim, LEAGUE_RANGES_2526);
     const delta = sCurr - sPrev;
-    const bothZero = sCurr < 0.005 && sPrev < 0.005;
-    const sign = delta > 0.005 ? '+' : '';
-    const arrowClass = delta > 0.005 ? 'delta-up' : delta < -0.005 ? 'delta-down' : 'delta-flat';
-    const arrow = delta > 0.005 ? '▲' : delta < -0.005 ? '▼' : '—';
+    const improved = delta > 0.02;
+    const declined = delta < -0.02;
+    const arrowClass = improved ? 'delta-up' : declined ? 'delta-down' : 'delta-flat';
+    const arrow = improved ? '▲' : declined ? '▼' : '—';
+    const sign = improved ? '+' : '';
+    const deltaLabel = `<span class="${arrowClass}">${arrow} ${sign}${(delta*100).toFixed(1)}</span>`;
 
+    // Bar: prev mapped onto current scale vs curr
     const longerIsPrev = sPrev > sCurr;
     const bgBar = longerIsPrev
       ? `<div style="position:absolute;height:100%;width:${sPrev*100}%;background:${COLOR_PREV};opacity:0.35"></div>`
@@ -1167,36 +1207,60 @@ function renderStatsDelta(teamCurr, teamPrev) {
       ? `<div style="position:absolute;height:100%;width:${sCurr*100}%;background:${COLOR_CURR}"></div>`
       : `<div style="position:absolute;height:100%;width:${sPrev*100}%;background:${COLOR_PREV};opacity:0.35"></div>`;
 
-    const deltaLabel = bothZero
-      ? `<span class="delta-flat">— no data</span>`
-      : `<span class="${arrowClass}">${arrow} ${sign}${(delta*100).toFixed(1)}</span>`;
-
-    // Discipline: show PIM and giveaways for both seasons
-    const rawCurr = teamCurr.raw[dim.raw_key];
-    const rawPrev = teamPrev.raw[dim.raw_key];
-    const discBreakdown = dim.key === 'discipline' ? (() => {
-      const pimP  = teamPrev.raw.pim_per_gp  != null ? teamPrev.raw.pim_per_gp.toFixed(2)  : '—';
-      const gaP   = teamPrev.raw.giveaways_per_gp != null ? teamPrev.raw.giveaways_per_gp.toFixed(2) : 'n/a';
-      const pimC  = teamCurr.raw.pim_per_gp  != null ? teamCurr.raw.pim_per_gp.toFixed(2)  : '—';
-      const gaC   = teamCurr.raw.giveaways_per_gp != null ? teamCurr.raw.giveaways_per_gp.toFixed(2) : 'n/a';
-      return `<div style="display:flex;justify-content:space-between;margin:3px 0 4px">
-        <span style="font-size:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif">
-          <span style="color:#a0b4cc;font-weight:600">PIM</span> ${pimP}/gp
-          &nbsp;·&nbsp;<span style="color:#a0b4cc;font-weight:600">GA</span> ${gaP}/gp
-        </span>
-        <span style="font-size:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif">
-          <span style="color:#a0b4cc;font-weight:600">PIM</span> ${pimC}/gp
-          &nbsp;·&nbsp;<span style="color:#a0b4cc;font-weight:600">GA</span> ${gaC}/gp
-        </span>
-      </div>`;
-    })() : '';
-
-    const rawCurrFmt = rawCurr != null ? dim.fmt(rawCurr) + dim.suffix : '—';
-    const rawPrevFmt = rawPrev != null ? dim.fmt(rawPrev) + dim.suffix : '—';
-    // For discipline the bottom raw line already covered by discBreakdown; show score change only
-    const rawLine = dim.key === 'discipline'
-      ? `<span style="color:var(--muted);font-size:10px;letter-spacing:.04em">PIM 70% · Giveaways 30% · inverted</span>`
-      : `${rawPrevFmt} → ${rawCurrFmt}`;
+    // Raw stat rows — per-dim, showing actual metric changes
+    const rawRows = (() => {
+      if (dim.key === 'discipline') {
+        const pimP = teamPrev.raw.pim_per_gp;
+        const pimC = teamCurr.raw.pim_per_gp;
+        const gaP  = teamPrev.raw.giveaways_per_gp;
+        const gaC  = teamCurr.raw.giveaways_per_gp;
+        const pimDir = pimC != null && pimP != null ? (pimC < pimP ? COLOR_UP : pimC > pimP ? COLOR_DOWN : 'var(--muted)') : 'var(--muted)';
+        const gaDir  = gaC  != null && gaP  != null ? (gaC  < gaP  ? COLOR_UP : gaC  > gaP  ? COLOR_DOWN : 'var(--muted)') : 'var(--muted)';
+        return `
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+            <span style="font-size:11px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.04em">PIM/GP</span>
+            <span style="font-size:12px;font-family:'Barlow Condensed',sans-serif;color:${pimDir};font-weight:700">
+              ${pimP != null ? pimP.toFixed(2) : '—'} → ${pimC != null ? pimC.toFixed(2) : '—'}
+            </span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px">
+            <span style="font-size:11px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.04em">GA/GP</span>
+            <span style="font-size:12px;font-family:'Barlow Condensed',sans-serif;color:${gaDir};font-weight:700">
+              ${gaP != null ? gaP.toFixed(2) : '—'} → ${gaC != null ? gaC.toFixed(2) : '—'}
+            </span>
+          </div>`;
+      }
+      if (dim.key === 'physical') {
+        const hP = teamPrev.raw.hits_per_gp, hC = teamCurr.raw.hits_per_gp;
+        const bP = teamPrev.raw.blocks_per_gp, bC = teamCurr.raw.blocks_per_gp;
+        const hDir = hC > hP ? COLOR_UP : hC < hP ? COLOR_DOWN : 'var(--muted)';
+        const bDir = bC > bP ? COLOR_UP : bC < bP ? COLOR_DOWN : 'var(--muted)';
+        return `
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+            <span style="font-size:11px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.04em">HITS/GP</span>
+            <span style="font-size:12px;font-family:'Barlow Condensed',sans-serif;color:${hDir};font-weight:700">${(hP??0).toFixed(1)} → ${(hC??0).toFixed(1)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px">
+            <span style="font-size:11px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.04em">BLOCKS/GP</span>
+            <span style="font-size:12px;font-family:'Barlow Condensed',sans-serif;color:${bDir};font-weight:700">${(bP??0).toFixed(1)} → ${(bC??0).toFixed(1)}</span>
+          </div>`;
+      }
+      // All other dims — single raw row
+      const rawP = teamPrev.raw[dim.raw_key];
+      const rawC = teamCurr.raw[dim.raw_key];
+      const dir = rawC != null && rawP != null
+        ? (dim.higher_better
+            ? (rawC > rawP ? COLOR_UP : rawC < rawP ? COLOR_DOWN : 'var(--muted)')
+            : (rawC < rawP ? COLOR_UP : rawC > rawP ? COLOR_DOWN : 'var(--muted)'))
+        : 'var(--muted)';
+      const fmtP = rawP != null ? dim.fmt(rawP) + dim.suffix : '—';
+      const fmtC = rawC != null ? dim.fmt(rawC) + dim.suffix : '—';
+      return `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+          <span style="font-size:11px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:.04em">${dim.suffix.trim().toUpperCase()}</span>
+          <span style="font-size:12px;font-family:'Barlow Condensed',sans-serif;color:${dir};font-weight:700">${fmtP} → ${fmtC}</span>
+        </div>`;
+    })();
 
     const card = document.createElement('div');
     card.className = 'stat-card';
@@ -1208,17 +1272,7 @@ function renderStatsDelta(teamCurr, teamPrev) {
       <div style="position:relative;height:6px;background:var(--surface2);margin-bottom:3px">
         ${bgBar}${fgBar}
       </div>
-      ${discBreakdown}
-      <div class="stat-values">
-        <div>
-          <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:${COLOR_PREV};font-weight:600">${(sPrev*100).toFixed(0)}</span>
-          <span style="font-size:10px;color:var(--muted)"> → </span>
-          <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:${COLOR_CURR};font-weight:700">${(sCurr*100).toFixed(0)}<span style="font-size:10px;font-weight:400;color:var(--muted)">/100</span></span>
-        </div>
-        <div style="font-size:11px;color:var(--muted);font-family:'Barlow Condensed',sans-serif">
-          ${rawLine}
-        </div>
-      </div>`;
+      ${rawRows}`;
     panel.appendChild(card);
   });
 }
@@ -1239,14 +1293,18 @@ Promise.all([
 ])
 .then(([data2526, data2425]) => {
   TEAMS_2526 = data2526.teams;
+  LEAGUE_RANGES_2526 = computeLeagueRanges(TEAMS_2526);
   computeProcessRanks(TEAMS_2526);
 
   if (data2425 && data2425.teams && Object.keys(data2425.teams).length > 0) {
     TEAMS_2425 = data2425.teams;
     computeProcessRanks(TEAMS_2425);
-    // Flag if this is seed/legacy data — methodology differs from current pipeline
     const meta2425 = data2425.meta || {};
     window.DELTA_STALE = !meta2425.season_id || String(meta2425.generated).includes('seed');
+    if (window.DELTA_STALE) {
+      document.getElementById('btn-2425').style.display = 'none';
+      document.getElementById('btn-delta').style.display = 'none';
+    }
   } else {
     document.getElementById('btn-2425').style.display = 'none';
     document.getElementById('btn-delta').style.display = 'none';
