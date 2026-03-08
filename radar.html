@@ -845,9 +845,12 @@ function showTooltip(e, team, dim, color) {
   const score = team.scores[dim.key];
   const rank = team.ranks[dim.key];
   const rawVal = team.raw[dim.raw_key];
+  const rawLine = dim.key === 'discipline'
+    ? `${dim.fmt(rawVal)}${dim.suffix} · ${(team.raw.giveaways_per_gp ?? 0).toFixed(2)} GA/gp`
+    : `${dim.fmt(rawVal)}${dim.suffix}`;
   tt.innerHTML = `<span style="color:${color};font-weight:700">${team.abbr}</span> · ${dim.label}<br>
     Score: <strong>${(score*100).toFixed(0)}</strong>/100 &nbsp;·&nbsp; Rank: <strong>#${rank}</strong>/32<br>
-    <span style="color:#5a6e87">${dim.fmt(rawVal)}${dim.suffix}</span>`;
+    <span style="color:#5a6e87">${rawLine}</span>`;
   tt.style.opacity = '1';
   const wrap = document.querySelector('.radar-wrap');
   const rect = wrap.getBoundingClientRect();
@@ -902,6 +905,15 @@ function renderStats(teamA, teamB) {
         <div class="stat-bar-track">
           <div class="stat-bar-fill" style="width:${sB*100}%;background:${COLOR_B}"></div>
         </div>
+        ${dim.key === 'discipline' ? `
+        <div style="display:flex;justify-content:space-between;margin:4px 0 2px">
+          <span style="font-size:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif">
+            PIM ${(teamA.raw.pim_per_gp??0).toFixed(2)} · GA ${(teamA.raw.giveaways_per_gp??0).toFixed(2)}
+          </span>
+          <span style="font-size:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;text-align:right">
+            PIM ${(teamB.raw.pim_per_gp??0).toFixed(2)} · GA ${(teamB.raw.giveaways_per_gp??0).toFixed(2)}
+          </span>
+        </div>` : ''}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:8px">
           <div>
             <div class="stat-val-a" style="color:${COLOR_A}">${(sA*100).toFixed(0)}<span style="font-size:10px;font-weight:400;color:#5a6e87">/100</span></div>
@@ -914,14 +926,35 @@ function renderStats(teamA, teamB) {
         </div>`;
     } else {
       const teamColor = teamA.primary === '#080c12' ? COLOR_A : teamA.primary;
+      // For discipline: show a split bar — PIM portion and giveaway portion
+      const barHTML = dim.key === 'discipline' ? (() => {
+        const pimRaw  = teamA.raw.pim_per_gp  ?? 0;
+        const gaRaw   = teamA.raw.giveaways_per_gp ?? 0;
+        const pimNorm = sA;  // overall bar is still the blended normalized score
+        // Visually split the bar 70/30 with labels
+        return `
+          <div style="margin-bottom:4px">
+            <div class="stat-bar-track" style="position:relative">
+              <div class="stat-bar-fill" style="width:${sA*100}%;background:linear-gradient(90deg,${teamA.primary},${teamA.secondary || COLOR_A})"></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:2px;margin-bottom:2px">
+            <span style="font-size:10px;color:var(--muted);font-family:'Barlow Condensed',sans-serif">
+              <span style="color:#a0b4cc;font-weight:600">PIM</span> ${pimRaw.toFixed(2)}/gp
+              <span style="color:var(--border);margin:0 4px">|</span>
+              <span style="color:#a0b4cc;font-weight:600">GA</span> ${gaRaw.toFixed(2)}/gp
+              <span style="color:var(--muted);margin-left:4px">· 70/30 blend, inverted</span>
+            </span>
+          </div>`;
+      })() : `<div class="stat-bar-track">
+          <div class="stat-bar-fill" style="width:${sA*100}%;background:linear-gradient(90deg,${teamA.primary},${teamA.secondary || COLOR_A})"></div>
+        </div>`;
       card.innerHTML = `
         <div class="stat-header">
           <div class="stat-name">${dim.label}</div>
           <div class="stat-rank">Rank <span>#${rA}</span>/32</div>
         </div>
-        <div class="stat-bar-track">
-          <div class="stat-bar-fill" style="width:${sA*100}%;background:linear-gradient(90deg,${teamA.primary},${teamA.secondary || COLOR_A})"></div>
-        </div>
+        ${barHTML}
         <div class="stat-values">
           <div class="stat-val-a" style="color:${COLOR_A}">${(sA*100).toFixed(0)}<span style="font-size:10px;font-weight:400;color:#5a6e87">/100</span></div>
           <div class="stat-raw">${rawAFmt}${rawAExtra}</div>
