@@ -517,6 +517,193 @@
     .controls { grid-template-columns: 1fr; }
     .controls.single { max-width: 100%; }
   }
+
+  /* ── Movers & Archetypes shared ── */
+  .view-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 24px;
+  }
+
+  /* ── Movers ── */
+  .movers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+  }
+
+  .movers-dim-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+  }
+
+  .movers-dim-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+  }
+
+  .movers-section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    margin-top: 12px;
+  }
+
+  .movers-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    font-family: 'Barlow Condensed', sans-serif;
+  }
+
+  .movers-abbr {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    width: 36px;
+    flex-shrink: 0;
+  }
+
+  .movers-bar-track {
+    flex: 1;
+    height: 5px;
+    background: var(--surface2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .movers-bar-fill {
+    position: absolute;
+    height: 100%;
+    top: 0;
+  }
+
+  .movers-delta {
+    font-size: 12px;
+    font-weight: 700;
+    width: 44px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .movers-raw {
+    font-size: 10px;
+    color: var(--muted);
+    width: 80px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── Archetypes ── */
+  .archetypes-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Barlow Condensed', sans-serif;
+  }
+
+  .archetypes-table th {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .archetypes-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid #111d2c;
+    font-size: 13px;
+    vertical-align: middle;
+  }
+
+  .archetypes-table tr:hover td { background: var(--surface); }
+
+  .arch-team-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .arch-dot {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+  }
+
+  .arch-abbr {
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    width: 38px;
+  }
+
+  .arch-name {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .arch-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    margin: 2px 3px 2px 0;
+    border: 1px solid;
+  }
+
+  .arch-score-bar {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+  }
+
+  .arch-pip {
+    width: 7px;
+    height: 14px;
+  }
+
+  .arch-season-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .arch-season-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .arch-season-btn.active { background: var(--surface2); color: var(--text); border-color: var(--accent); }
 </style>
 </head>
 <body>
@@ -537,6 +724,8 @@
     <div class="mode-toggle" style="margin-bottom:0">
       <button class="mode-btn active" id="btn-single" onclick="setMode('single')">Single Team</button>
       <button class="mode-btn" id="btn-compare" onclick="setMode('compare')">Compare</button>
+      <button class="mode-btn" id="btn-movers" onclick="setMode('movers')">⬆ Movers</button>
+      <button class="mode-btn" id="btn-archetypes" onclick="setMode('archetypes')">Archetypes</button>
     </div>
     <div class="season-toggle" id="season-toggle">
       <button class="season-btn active" id="btn-2526" onclick="setSeason('2526')">2025–26</button>
@@ -566,6 +755,18 @@
     </div>
 
     <div class="stats-panel" id="stats-panel"></div>
+  </div>
+
+  <!-- ── Movers View ───────────────────────────────────────────────────────── -->
+  <div id="movers-view" style="display:none">
+    <div class="view-title">League Movers <span style="font-size:13px;font-weight:400;color:var(--muted);letter-spacing:.04em">2024–25 → 2025–26 · common-scale delta</span></div>
+    <div id="movers-content"></div>
+  </div>
+
+  <!-- ── Archetypes View ──────────────────────────────────────────────────── -->
+  <div id="archetypes-view" style="display:none">
+    <div class="view-title" id="archetypes-title">Team Archetypes <span id="archetypes-season-label" style="font-size:13px;font-weight:400;color:var(--muted);letter-spacing:.04em"></span></div>
+    <div id="archetypes-content"></div>
   </div>
 
 </div>
@@ -746,14 +947,34 @@ function populateSelects() {
 
 function setMode(m) {
   mode = m;
-  document.getElementById('btn-single').classList.toggle('active', m === 'single');
-  document.getElementById('btn-compare').classList.toggle('active', m === 'compare');
-  document.getElementById('group-b').style.display = m === 'compare' ? '' : 'none';
-  document.getElementById('controls').className = 'controls' + (m === 'single' ? ' single' : '');
-  // Delta only available in single mode
-  document.getElementById('btn-delta').style.display = m === 'single' ? '' : 'none';
-  if (m === 'compare' && currentSeason === 'delta') setSeason('2526');
-  update();
+  const isRadar = m === 'single' || m === 'compare';
+  const isMovers = m === 'movers';
+  const isArchetypes = m === 'archetypes';
+
+  ['single','compare','movers','archetypes'].forEach(id => {
+    document.getElementById(`btn-${id}`).classList.toggle('active', m === id);
+  });
+
+  // Show/hide radar vs league views
+  document.getElementById('controls').style.display = isRadar ? '' : 'none';
+  document.querySelector('.main').style.display = isRadar ? '' : 'none';
+  document.getElementById('movers-view').style.display = isMovers ? '' : 'none';
+  document.getElementById('archetypes-view').style.display = isArchetypes ? '' : 'none';
+
+  // Season toggle: movers needs delta available; archetypes shows season switcher itself
+  document.getElementById('season-toggle').style.display = isMovers ? 'none' : (isArchetypes ? 'none' : '');
+
+  if (isRadar) {
+    document.getElementById('group-b').style.display = m === 'compare' ? '' : 'none';
+    document.getElementById('controls').className = 'controls' + (m === 'single' ? ' single' : '');
+    document.getElementById('btn-delta').style.display = m === 'single' ? '' : 'none';
+    if (m === 'compare' && currentSeason === 'delta') setSeason('2526');
+    update();
+  } else if (isMovers) {
+    renderMovers();
+  } else if (isArchetypes) {
+    renderArchetypes('2526');
+  }
 }
 
 // ── Radar drawing ─────────────────────────────────────────────────────────────
@@ -1277,6 +1498,151 @@ function renderStatsDelta(teamCurr, teamPrev) {
   });
 }
 
+// ── Movers ────────────────────────────────────────────────────────────────────
+function renderMovers() {
+  const el = document.getElementById('movers-content');
+  if (window.DELTA_STALE || !Object.keys(TEAMS_2425).length) {
+    el.innerHTML = `<div style="color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:14px;padding:24px 0">
+      Delta data unavailable — run CI to generate 2024–25 season data.</div>`;
+    return;
+  }
+
+  const common = Object.keys(TEAMS_2526).filter(a => TEAMS_2425[a]);
+  const TOP_N = 5;
+
+  const html = DIMS.map(dim => {
+    // Compute common-scale delta for every team
+    const entries = common.map(abbr => {
+      const curr = TEAMS_2526[abbr];
+      const prev = TEAMS_2425[abbr];
+      const sCurr = curr.scores[dim.key];
+      const sPrev = normOnCurrentScale(getRawBlend(prev.raw, dim), dim, LEAGUE_RANGES_2526);
+      const delta = sCurr - sPrev;
+      const rawPrev = getRawBlend(prev.raw, dim);
+      const rawCurr = getRawBlend(curr.raw, dim);
+      return { abbr, name: curr.name, primary: curr.primary, delta, rawPrev, rawCurr };
+    }).sort((a, b) => b.delta - a.delta);
+
+    const risers = entries.slice(0, TOP_N);
+    const fallers = entries.slice(-TOP_N).reverse();
+    const maxAbs = Math.max(...entries.map(e => Math.abs(e.delta)));
+
+    const makeRow = (e, up) => {
+      const barW = Math.abs(e.delta) / (maxAbs || 1) * 100;
+      const color = up ? '#3ddc84' : '#ff6b6b';
+      // raw prev→curr display using dim.fmt for the primary key
+      const rawPrevFmt = dim.fmt(e.rawPrev) + dim.suffix;
+      const rawCurrFmt = dim.fmt(e.rawCurr) + dim.suffix;
+      return `<div class="movers-row">
+        <span class="movers-abbr" style="color:${e.primary}">${e.abbr}</span>
+        <div class="movers-bar-track">
+          <div class="movers-bar-fill" style="width:${barW}%;background:${color};left:0"></div>
+        </div>
+        <span class="movers-delta" style="color:${color}">${e.delta > 0 ? '+' : ''}${(e.delta*100).toFixed(1)}</span>
+        <span class="movers-raw">${rawPrevFmt} → ${rawCurrFmt}</span>
+      </div>`;
+    };
+
+    return `<div class="movers-dim-card">
+      <div class="movers-dim-title">${dim.label}</div>
+      <div class="movers-section-label" style="color:#3ddc84">▲ Biggest Risers</div>
+      ${risers.map(e => makeRow(e, true)).join('')}
+      <div class="movers-section-label" style="color:#ff6b6b;margin-top:16px">▼ Biggest Fallers</div>
+      ${fallers.map(e => makeRow(e, false)).join('')}
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `<div class="movers-grid">${html}</div>`;
+}
+
+// ── Archetypes ────────────────────────────────────────────────────────────────
+// Archetype labels: pick the top 1-2 dimensions above threshold, else "Balanced"
+const ARCHETYPE_LABELS = {
+  possession:  { label: 'Puck Possessor',   color: '#4a9eff' },
+  transition:  { label: 'Puck Hunter',       color: '#f4c430' },
+  finishing:   { label: 'Sharp Shooter',     color: '#ff9f40' },
+  physical:    { label: 'Physical',          color: '#c97bff' },
+  discipline:  { label: 'Disciplined',       color: '#5ddb8a' },
+  goaltending: { label: 'Goalie-Driven',     color: '#56d0e0' },
+  defensive:   { label: 'Defensive Shell',   color: '#a0b4cc' },
+};
+
+const ARCH_THRESHOLD = 0.65;   // score must be above this to earn the badge
+const ARCH_MAX_BADGES = 2;     // max primary badges shown
+
+function getArchetypes(team) {
+  const scored = DIMS.map(d => ({ key: d.key, score: team.scores[d.key] }))
+    .filter(d => d.score >= ARCH_THRESHOLD)
+    .sort((a, b) => b.score - a.score);
+  if (!scored.length) return [{ key: 'balanced', label: 'Balanced', color: '#3a5570' }];
+  return scored.slice(0, ARCH_MAX_BADGES).map(d => ({
+    key: d.key, ...ARCHETYPE_LABELS[d.key], score: d.score
+  }));
+}
+
+let archSeason = '2526';
+
+function renderArchetypes(season) {
+  archSeason = season;
+  const teams = season === '2526' ? TEAMS_2526 : TEAMS_2425;
+  const seasonLabel = season === '2526' ? '2025–26' : '2024–25';
+
+  document.getElementById('archetypes-season-label').textContent = `· ${seasonLabel}`;
+
+  const sorted = Object.values(teams).sort((a,b) => (a.standings_rank||99) - (b.standings_rank||99));
+
+  const rows = sorted.map(team => {
+    const arches = getArchetypes(team);
+    const badges = arches.map(a =>
+      `<span class="arch-badge" style="color:${a.color};border-color:${a.color}33;background:${a.color}11">${a.label}</span>`
+    ).join('');
+
+    // Score pips: 7 small bars colored by score
+    const pips = DIMS.map(d => {
+      const s = team.scores[d.key];
+      const alpha = 0.2 + s * 0.8;
+      const col = ARCHETYPE_LABELS[d.key]?.color || '#4a9eff';
+      return `<div class="arch-pip" style="background:${col};opacity:${alpha.toFixed(2)}" title="${d.label}: ${(s*100).toFixed(0)}"></div>`;
+    }).join('');
+
+    const rankStr = team.standings_rank ? `#${team.standings_rank}` : '—';
+
+    return `<tr>
+      <td>
+        <div class="arch-team-cell">
+          <div class="arch-dot" style="background:${team.primary}"></div>
+          <span class="arch-abbr">${team.abbr}</span>
+          <span class="arch-name">${team.name}</span>
+        </div>
+      </td>
+      <td style="color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:12px">${rankStr}</td>
+      <td>${badges}</td>
+      <td><div class="arch-score-bar">${pips}</div></td>
+    </tr>`;
+  }).join('');
+
+  const hasBoth = !window.DELTA_STALE && Object.keys(TEAMS_2425).length > 0;
+  const seasonToggle = hasBoth ? `
+    <div class="arch-season-toggle">
+      <button class="arch-season-btn ${archSeason==='2526'?'active':''}" onclick="renderArchetypes('2526')">2025–26</button>
+      <button class="arch-season-btn ${archSeason==='2425'?'active':''}" onclick="renderArchetypes('2425')">2024–25</button>
+    </div>` : '';
+
+  document.getElementById('archetypes-content').innerHTML = `
+    ${seasonToggle}
+    <div style="overflow-x:auto">
+      <table class="archetypes-table">
+        <thead><tr>
+          <th>Team</th>
+          <th>Rank</th>
+          <th>Identity</th>
+          <th style="min-width:80px">Profile</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 function computeProcessRanks(teamsObj) {
   const avgRanks = Object.entries(teamsObj).map(([abbr, t]) => ({
@@ -1304,10 +1670,12 @@ Promise.all([
     if (window.DELTA_STALE) {
       document.getElementById('btn-2425').style.display = 'none';
       document.getElementById('btn-delta').style.display = 'none';
+      document.getElementById('btn-movers').style.display = 'none';
     }
   } else {
     document.getElementById('btn-2425').style.display = 'none';
     document.getElementById('btn-delta').style.display = 'none';
+    document.getElementById('btn-movers').style.display = 'none';
   }
 
   TEAMS_DATA = TEAMS_2526;
