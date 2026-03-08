@@ -776,7 +776,15 @@ function update() {
   if (currentSeason === 'delta' && mode === 'single') {
     const teamA = TEAMS_2526[abbA];
     const teamA_prev = TEAMS_2425[abbA];
-    if (!teamA || !teamA_prev) return;
+    if (!teamA_prev || Object.keys(TEAMS_2425).length === 0) {
+      document.getElementById('radar-title').textContent = 'No 2024–25 data yet';
+      document.getElementById('radar-legend').innerHTML = '';
+      document.getElementById('radar-svg').innerHTML = '';
+      document.getElementById('stats-panel').innerHTML =
+        '<div style="color:var(--muted);font-family:\'Barlow Condensed\',sans-serif;font-size:13px;padding:12px">Run CI with --season 20242025 to populate 2024–25 data.</div>';
+      return;
+    }
+    if (!teamA) return;
     renderTitleDelta(teamA);
     drawRadarDelta(teamA, teamA_prev);
     renderStatsDelta(teamA, teamA_prev);
@@ -961,11 +969,10 @@ Promise.all([
   TEAMS_2526 = data2526.teams;
   computeProcessRanks(TEAMS_2526);
 
-  if (data2425) {
+  if (data2425 && data2425.teams && Object.keys(data2425.teams).length > 0) {
     TEAMS_2425 = data2425.teams;
     computeProcessRanks(TEAMS_2425);
   } else {
-    // 2024-25 not yet available — hide season toggle options
     document.getElementById('btn-2425').style.display = 'none';
     document.getElementById('btn-delta').style.display = 'none';
   }
