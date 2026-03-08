@@ -1166,6 +1166,8 @@ function renderStatsDelta(teamCurr, teamPrev) {
       : `<span class="${arrowClass}">${arrow} ${sign}${(delta*100).toFixed(1)}</span>`;
 
     // Discipline: show PIM and giveaways for both seasons
+    const rawCurr = teamCurr.raw[dim.raw_key];
+    const rawPrev = teamPrev.raw[dim.raw_key];
     const discBreakdown = dim.key === 'discipline' ? (() => {
       const pimP  = teamPrev.raw.pim_per_gp  != null ? teamPrev.raw.pim_per_gp.toFixed(2)  : '—';
       const gaP   = teamPrev.raw.giveaways_per_gp != null ? teamPrev.raw.giveaways_per_gp.toFixed(2) : '—';
