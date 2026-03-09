@@ -3,7 +3,7 @@ name: Weekly Team Identity Refresh
 on:
   schedule:
     # Every Monday at 6:00 AM UTC
-    - cron: '0 6 * * 1'
+    - cron: '0 10 * * 1'
   workflow_dispatch:
     inputs:
       team:
